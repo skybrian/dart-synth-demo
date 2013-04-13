@@ -1,6 +1,6 @@
 import 'dart:html';
 import 'dart:math' as math;
-import 'audio.dart';
+import 'package:synth_demo/audio.dart';
 import 'package:js/js.dart' as js;
 
 num TAU = math.PI * 2;
