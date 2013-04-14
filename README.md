@@ -4,7 +4,7 @@ A simple music synthesizer written in Dart and using Web Audio. Demonstrates how
 Web Audio using the Dart JavaScript Interop library, instead of using Dart's built-in
 Web Audio library. (I had to do this due to a [bug][1].)
 
-== Caveats ==
+## Caveats
 
 * Runs in Chrome only because it relies on Web Audio.
 
