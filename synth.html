@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Synth</title>
+    <link rel="stylesheet" href="synth.css">
+  </head>
+  <body>
+    <div class="container-fluid">
+    
+      <h1>Synth</h1>
+    
+      <div id="status"></div>
+    
+      <div class="control-row">
+        <input id="volume" type="range" class="xlarge" min="0" max="100" /> Volume
+      </div>
+    
+      <div class="input">
+        <div id="sounds"></div>
+      </div>
+    
+      <div id="scroll">
+        <div id="keys">
+          <div id="white_keys"></div>
+    
+          <div id="black_keys">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      function createAudioContext() {
+        return new webkitAudioContext();
+      }
+      function getString(obj) {
+        return obj.toString();
+      }
+    </script>
+    <script type="application/dart" src="synth.dart"></script>
+    <script src="packages/browser/dart.js"></script>
+  </body>
+</html>
