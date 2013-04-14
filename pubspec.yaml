@@ -2,4 +2,4 @@ name: synth_demo
 description: Simple Music Synthesizer
 dependencies:
   browser: any
-  js: { hosted: js }
+  js: any
