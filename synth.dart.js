@@ -53,11 +53,12 @@ $$.main_anon4 = {"": "Closure;",
 
 $$.main_anon5 = {"": "Closure;volume_0,volumeSlider_1",
   call$1: function(e) {
-    $.set$value$x($.get$gain$x(this.volume_0), $.$div$n($.Primitives_parseDouble($.get$value$x(this.volumeSlider_1), null), 100));
+    var t1 = this.volume_0.gain;
+    t1.set$value(t1, $.$div$n($.Primitives_parseDouble($.get$value$x(this.volumeSlider_1), null), 100));
   }
 };
 
-$$.Keyboard = {"": "Object;soundsId,blackKeysId,whiteKeysId,destination*,selectedSoundButton@,selectedPatch@",
+$$.Keyboard = {"": "Object;soundsId,blackKeysId,whiteKeysId,destination>,selectedSoundButton@,selectedPatch@",
   addPatchButton$3: function(label, envelope, waveBuffer) {
     var patch, button, t1, t2;
     patch = $.Patch$(waveBuffer, envelope);
@@ -232,13 +233,14 @@ $$.Patch = {"": "Object;waveBuffer,attackTime,decayTime,sustainLevel,releaseTime
       if (typeof t3 !== "number")
         throw $.iae(t3);
       t1.ring_0 = $.makeTone(t2, hertz * t3, startTime);
-      $.set$value$x($.get$gain$x(t1.ring_0), this.ringVolume);
-      $.connect$2$x(t1.ring_0, envelope, 0);
+      t3 = t1.ring_0.gain;
+      t3.set$value(t3, this.ringVolume);
+      t3 = t1.ring_0;
+      t3.connect$2(t3, envelope, 0);
     }
-    $.connect$2$x(tone, envelope, 0);
-    t2 = $.getInterceptor$x(envelope);
-    t2.connect$2(envelope, destination, 0);
-    t2.release$0(envelope);
+    tone.connect$2(tone, envelope, 0);
+    envelope.connect$2(envelope, destination, 0);
+    envelope.release$0(envelope);
     return new $.Patch_playNote_stop(t1, this, tone);
   },
   Patch$2: function(waveBuffer, adsr) {
@@ -263,16 +265,20 @@ $$.Patch_playNote_stop = {"": "Closure;box_0,this_1,tone_2",
     t1 = this.this_1;
     doneTime = $.$add$ns(stopTime, t1.get$releaseTime());
     t2 = this.tone_2;
-    $.setTargetAtTime$3$x($.get$gain$x(t2), 0, stopTime, t1.get$releaseTime());
+    t3 = t2.gain;
+    t3.setTargetAtTime$3(t3, 0, stopTime, t1.get$releaseTime());
     t3 = $.getInterceptor$ns(doneTime);
-    $.stop$1$x(t2, t3.$add(doneTime, 2));
-    $.release$0$x(t2);
+    t2.stop$1(t2, t3.$add(doneTime, 2));
+    t2.release$0(t2);
     t2 = this.box_0;
     t4 = t2.ring_0;
     if (t4 != null) {
-      $.setTargetAtTime$3$x($.get$gain$x(t4), 0, stopTime, t1.get$releaseTime());
-      $.stop$1$x(t2.ring_0, t3.$add(doneTime, 2));
-      $.release$0$x(t2.ring_0);
+      t4 = t4.gain;
+      t4.setTargetAtTime$3(t4, 0, stopTime, t1.get$releaseTime());
+      t1 = t2.ring_0;
+      t1.stop$1(t1, t3.$add(doneTime, 2));
+      t2 = t2.ring_0;
+      t2.release$0(t2);
     }
   }
 };
@@ -322,6 +328,9 @@ $$.ListIterable = {"": "Iterable;",
         throw $.$$throw($.ConcurrentModificationError$(this));
     }
   },
+  get$isEmpty: function(_) {
+    return $.$eq(this.get$length(this), 0);
+  },
   map$1: function(_, f) {
     return $.MappedListIterable$(this, f, null, null);
   },
@@ -351,22 +360,22 @@ $$.ListIterable = {"": "Iterable;",
   }
 };
 
-$$.ListIterator = {"": "Object;_iterable,_liblib0$_length,_index,_liblib0$_current",
+$$.ListIterator = {"": "Object;_iterable,_length,_index,_current",
   get$current: function() {
-    return this._liblib0$_current;
+    return this._current;
   },
   moveNext$0: function() {
     var t1, t2, t3;
-    t1 = this._liblib0$_length;
+    t1 = this._length;
     t2 = this._iterable;
     if ($.$eq(t1, $.get$length$asx(t2)) !== true)
       throw $.$$throw($.ConcurrentModificationError$(t2));
     t3 = this._index;
     if (t3 === t1) {
-      this._liblib0$_current = null;
+      this._current = null;
       return false;
     }
-    this._liblib0$_current = $.elementAt$1$ax(t2, t3);
+    this._current = $.elementAt$1$ax(t2, t3);
     this._index = this._index + 1;
     return true;
   }
@@ -384,6 +393,10 @@ $$.MappedIterable = {"": "Iterable;_iterable,_f",
     var t1 = this._iterable;
     return t1.get$length(t1);
   },
+  get$isEmpty: function(_) {
+    var t1 = this._iterable;
+    return t1.get$isEmpty(t1);
+  },
   elementAt$1: function(_, index) {
     var t1 = this._iterable;
     return this._f$1(t1.elementAt$1(t1, index));
@@ -393,21 +406,21 @@ $$.MappedIterable = {"": "Iterable;_iterable,_f",
   }
 };
 
-$$.MappedIterator = {"": "Iterator;_liblib0$_current,_iterator,_f",
+$$.MappedIterator = {"": "Iterator;_current,_iterator,_f",
   _f$1: function(arg0) {
     return this._f.call$1(arg0);
   },
   moveNext$0: function() {
     var t1 = this._iterator;
     if (t1.moveNext$0()) {
-      this._liblib0$_current = this._f$1(t1.get$current());
+      this._current = this._f$1(t1.get$current());
       return true;
     }
-    this._liblib0$_current = null;
+    this._current = null;
     return false;
   },
   get$current: function() {
-    return this._liblib0$_current;
+    return this._current;
   },
   $asIterator: function (S, T) { return [T]; }
 };
@@ -427,7 +440,8 @@ $$.MappedListIterable = {"": "ListIterable;_source,_f",
 
 $$.WhereIterable = {"": "Iterable;_iterable,_f",
   get$iterator: function(_) {
-    return $.WhereIterator$($.get$iterator$ax(this._iterable), this._f, $.getRuntimeTypeArgument(this, this["$asWhereIterable"], 0));
+    var t1 = this._iterable;
+    return $.WhereIterator$(t1.get$iterator(t1), this._f, $.getRuntimeTypeArgument(this, this["$asWhereIterable"], 0));
   },
   $asIterable: function() {
     return null;
@@ -480,6 +494,9 @@ $$.HashMap_addAll_anon = {"": "Closure;this_0",
 $$.HashMapKeyIterable = {"": "Iterable;_map",
   get$length: function(_) {
     return this._map._liblib1$_length;
+  },
+  get$isEmpty: function(_) {
+    return this._map._liblib1$_length === 0;
   },
   get$iterator: function(_) {
     var t1 = this._map;
@@ -590,9 +607,6 @@ $$.JSBool = {"": "Interceptor;",
   get$hashCode: function(receiver) {
     return receiver ? 519018 : 218159;
   },
-  get$runtimeType: function(receiver) {
-    return $.Type_bool;
-  },
   $isbool: true
 };
 
@@ -605,25 +619,22 @@ $$.JSNull = {"": "Interceptor;",
   },
   get$hashCode: function(receiver) {
     return 0;
-  },
-  get$runtimeType: function(receiver) {
-    return $.Type_Null;
   }
 };
 
 $$.CloseToken = {"": "Object;", $isCloseToken: true};
 
-$$.JsIsolateSink = {"": "StreamSink;_isClosed,_liblib2$_port<",
+$$.JsIsolateSink = {"": "StreamSink;_isClosed,_port<",
   add$1: function(_, message) {
-    $.send$1$x(this._liblib2$_port, message);
+    $.send$1$x(this._port, message);
   },
   $eq: function(_, other) {
     if (other == null)
       return false;
-    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$isIsolateSink && $.$eq(this._liblib2$_port, other.get$_liblib2$_port()) === true;
+    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$isIsolateSink && $.$eq(this._port, other.get$_port()) === true;
   },
   get$hashCode: function(_) {
-    return $.$add$ns($.get$hashCode$(this._liblib2$_port), 499);
+    return $.$add$ns($.get$hashCode$(this._port), 499);
   },
   $isJsIsolateSink: true,
   $asStreamSink: function () { return [null]; },
@@ -884,7 +895,7 @@ $$._NativeJsSendPort_send_anon = {"": "Closure;this_1,message_2,replyTo_3",
     isolate = t4.$index(t4, t2.get$_isolateId());
     if (isolate == null)
       return;
-    if (t2.get$_receivePort().get$_liblib2$_callback() == null)
+    if (t2.get$_receivePort().get$_callback() == null)
       return;
     shouldSerialize = $globalState.currentContext != null && $.$eq($.get$id$x($globalState.currentContext), t2.get$_isolateId()) !== true;
     msg = this.message_2;
@@ -902,7 +913,7 @@ $$._NativeJsSendPort_send__anon = {"": "Closure;box_0,this_4,shouldSerialize_5",
   call$0: function() {
     var t1, t2;
     t1 = this.this_4;
-    if (t1.get$_receivePort().get$_liblib2$_callback() != null) {
+    if (t1.get$_receivePort().get$_callback() != null) {
       if (this.shouldSerialize_5) {
         t2 = this.box_0;
         t2.msg_0 = $._deserializeMessage(t2.msg_0);
@@ -910,7 +921,7 @@ $$._NativeJsSendPort_send__anon = {"": "Closure;box_0,this_4,shouldSerialize_5",
       }
       t1 = t1.get$_receivePort();
       t2 = this.box_0;
-      t1._liblib2$_callback$2(t2.msg_0, t2.reply_1);
+      t1._callback$2(t2.msg_0, t2.reply_1);
     }
   }
 };
@@ -964,15 +975,15 @@ $$._WorkerSendPort_send_anon = {"": "Closure;this_0,message_1,replyTo_2",
   }
 };
 
-$$.ReceivePortImpl = {"": "Object;_id<,_liblib2$_callback<",
-  _liblib2$_callback$2: function(arg0, arg1) {
-    return this._liblib2$_callback.call$2(arg0, arg1);
+$$.ReceivePortImpl = {"": "Object;_id<,_callback<",
+  _callback$2: function(arg0, arg1) {
+    return this._callback.call$2(arg0, arg1);
   },
   receive$1: function(onMessage) {
-    this._liblib2$_callback = onMessage;
+    this._callback = onMessage;
   },
   close$0: function(_) {
-    this._liblib2$_callback = null;
+    this._callback = null;
     $globalState.currentContext.unregister$1(this._id);
   },
   toSendPort$0: function() {
@@ -1013,7 +1024,7 @@ $$._PendingSendPortFinder = {"": "_MessageTraverser;ports,_visited",
       this.ports.push(port.get$_futurePort());
   },
   visitIsolateSink$1: function(sink) {
-    var t1 = sink._liblib2$_port;
+    var t1 = sink._port;
     if (false)
       this.ports.push(t1.get$_futurePort());
   },
@@ -1046,7 +1057,7 @@ $$._JsSerializer = {"": "_Serializer;_nextFreeRefId,_visited",
   },
   visitIsolateSink$1: function(sink) {
     var isClosed = sink._isClosed;
-    return ["isolateSink", this.visitSendPort$1(sink._liblib2$_port), isClosed];
+    return ["isolateSink", this.visitSendPort$1(sink._port), isClosed];
   },
   visitCloseToken$1: function(token) {
     return ["closeToken"];
@@ -1067,7 +1078,7 @@ $$._JsCopier = {"": "_Copier;_visited",
   visitIsolateSink$1: function(sink) {
     var isClosed, result;
     isClosed = sink._isClosed;
-    result = $.JsIsolateSink$fromPort(this.visitSendPort$1(sink._liblib2$_port));
+    result = $.JsIsolateSink$fromPort(this.visitSendPort$1(sink._port));
     result._isClosed = isClosed;
     return result;
   },
@@ -1579,6 +1590,9 @@ $$.JSArray = {"": "Interceptor;",
   indexOf$1: function($receiver, element) {
     return this.indexOf$2($receiver, element, 0);
   },
+  get$isEmpty: function(receiver) {
+    return receiver.length === 0;
+  },
   toString$0: function(receiver) {
     var result = $.StringBuffer$("");
     $.ToString__emitCollection(receiver, result, $.List_List($, null));
@@ -1595,9 +1609,6 @@ $$.JSArray = {"": "Interceptor;",
   },
   get$hashCode: function(receiver) {
     return $.Primitives_objectHashCode(receiver);
-  },
-  get$runtimeType: function(receiver) {
-    return $.TypeImpl$($.getRuntimeTypeString(receiver));
   },
   get$length: function(receiver) {
     return receiver.length;
@@ -1653,10 +1664,7 @@ $$.JSFixedArray = {"": "JSMutableArray;"};
 
 $$.JSExtendableArray = {"": "JSMutableArray;"};
 
-$$.JSInvocationMirror = {"": "Object;memberName,_internalName,_kind,_liblib6$_arguments,_namedArgumentNames,_namedIndices",
-  get$isMethod: function() {
-    return $.$eq(this._kind, 0);
-  },
+$$.JSInvocationMirror = {"": "Object;memberName,_internalName,_kind,_liblib4$_arguments,_namedArgumentNames,_namedIndices",
   get$isGetter: function() {
     return $.$eq(this._kind, 1);
   },
@@ -1671,7 +1679,7 @@ $$.JSInvocationMirror = {"": "Object;memberName,_internalName,_kind,_liblib6$_ar
     if (this.get$isGetter() === true)
       return;
     list = [];
-    t1 = this._liblib6$_arguments;
+    t1 = this._liblib4$_arguments;
     if (typeof t1 !== "string" && (typeof t1 !== "object" || t1 === null || t1.constructor !== Array && !$.getInterceptor(t1).$isJavaScriptIndexingBehavior()))
       return this.get$positionalArguments$bailout(1, t1, list);
     t3 = t1.length;
@@ -1702,7 +1710,7 @@ $$.JSInvocationMirror = {"": "Object;memberName,_internalName,_kind,_liblib6$_ar
     if (typeof t1 !== "string" && (typeof t1 !== "object" || t1 === null || t1.constructor !== Array && !$.getInterceptor(t1).$isJavaScriptIndexingBehavior()))
       return this.get$namedArguments$bailout(1, t1, map);
     namedArgumentCount = t1.length;
-    t3 = this._liblib6$_arguments;
+    t3 = this._liblib4$_arguments;
     if (typeof t3 !== "string" && (typeof t3 !== "object" || t3 === null || t3.constructor !== Array && !$.getInterceptor(t3).$isJavaScriptIndexingBehavior()))
       return this.get$namedArguments$bailout(3, t1, map, namedArgumentCount, t3);
     namedArgumentsStartIndex = t3.length - namedArgumentCount;
@@ -1729,7 +1737,7 @@ $$.JSInvocationMirror = {"": "Object;memberName,_internalName,_kind,_liblib6$_ar
         namedArgumentCount = $.get$length$asx(t1);
       case 2:
         state0 = 0;
-        t4 = this._liblib6$_arguments;
+        t4 = this._liblib4$_arguments;
       case 3:
         var namedArgumentsStartIndex, t2, t3, t5, i;
         state0 = 0;
@@ -1896,35 +1904,23 @@ $$.JSNumber = {"": "Interceptor;",
   $isnum: true
 };
 
-$$.JSInt = {"": "JSNumber;",
-  get$runtimeType: function(receiver) {
-    return $.Type_$int;
-  },
-  $is$int: true,
-  $isnum: true
-};
+$$.JSInt = {"": "JSNumber;", $is$int: true, $isnum: true};
 
-$$.JSDouble = {"": "JSNumber;",
-  get$runtimeType: function(receiver) {
-    return $.Type_$double;
-  },
-  $is$double: true,
-  $isnum: true
-};
+$$.JSDouble = {"": "JSNumber;", $is$double: true, $isnum: true};
 
 $$.TypeImpl = {"": "Object;typeName",
   toString$0: function(_) {
     return this.typeName;
   },
   get$hashCode: function(_) {
-    return $.get$hashCode$(this.typeName);
+    return $.JSString_methods.get$hashCode(this.typeName);
   },
   $eq: function(_, other) {
     if (other == null)
       return false;
     if (!(typeof other === "object" && other !== null && !!$.getInterceptor(other).$isTypeImpl))
       return false;
-    return $.$eq(this.typeName, other.typeName);
+    return this.typeName === other.typeName;
   },
   $isTypeImpl: true
 };
@@ -1941,9 +1937,6 @@ $$.JSString = {"": "Interceptor;",
     if (!(typeof other === "string"))
       throw $.$$throw($.ArgumentError$(other));
     return receiver + other;
-  },
-  concat$1: function(receiver, other) {
-    return this.$add(receiver, other);
   },
   endsWith$1: function(receiver, other) {
     var otherLength, t1;
@@ -2036,9 +2029,6 @@ $$.JSString = {"": "Interceptor;",
     hash = hash ^ (hash >> 11);
     return 536870911 & hash + ((16383 & hash) << 15 >>> 0);
   },
-  get$runtimeType: function(receiver) {
-    return $.Type_String;
-  },
   get$length: function(receiver) {
     return receiver.length;
   },
@@ -2082,7 +2072,7 @@ $$._convertJsonToDart_walk = {"": "Closure;revive_0",
   }
 };
 
-$$.MetaInfo = {"": "Object;_tag<,_tags,_liblib6$_set<"};
+$$.MetaInfo = {"": "Object;_tag<,_tags,_liblib4$_set<"};
 
 $$.AsyncError = {"": "Object;error>,stackTrace<,cause<",
   _writeOn$1: function(buffer) {
@@ -2153,7 +2143,7 @@ $$._CompleterImpl = {"": "Object;future,_isComplete",
     if (this._isComplete)
       throw $.$$throw($.StateError$("Future already completed"));
     this._isComplete = true;
-    this.future._liblib3$_setValue$1(value);
+    this.future._liblib0$_setValue$1(value);
   },
   complete$0: function($receiver) {
     return this.complete$1($receiver, null);
@@ -2173,7 +2163,7 @@ $$._CompleterImpl = {"": "Object;future,_isComplete",
 
 $$._FutureListenerWrapper = {"": "Object;future,_nextListener@",
   _sendValue$1: function(value) {
-    this.future._liblib3$_setValue$1(value);
+    this.future._liblib0$_setValue$1(value);
   },
   _sendError$1: function(error) {
     this.future._setError$1(error);
@@ -2242,7 +2232,7 @@ $$._FutureImpl = {"": "Object;_state@,_resultOrListeners<",
     $.Timer_run(new $._FutureImpl__handleError_anon(error, errorFuture));
     return errorFuture;
   },
-  _liblib3$_setValue$1: function(value) {
+  _liblib0$_setValue$1: function(value) {
     var listeners, listeners0;
     if (this.get$_isComplete())
       throw $.$$throw($.StateError$("Future already completed"));
@@ -2255,8 +2245,8 @@ $$._FutureImpl = {"": "Object;_state@,_resultOrListeners<",
       listeners._sendValue$1(value);
     }
   },
-  get$_liblib3$_setValue: function() {
-    return new $.BoundClosure$1(this, "_liblib3$_setValue$1");
+  get$_liblib0$_setValue: function() {
+    return new $.BoundClosure$1(this, "_liblib0$_setValue$1");
   },
   _setError$1: function(error) {
     var listeners, listeners0;
@@ -2308,7 +2298,7 @@ $$._FutureImpl = {"": "Object;_state@,_resultOrListeners<",
       t1._nextListener = this._resultOrListeners;
       this._resultOrListeners = t1;
     } else if (this.get$_hasValue())
-      future._liblib3$_setValue$1(this._resultOrListeners);
+      future._liblib0$_setValue$1(this._resultOrListeners);
     else {
       this._state = (this._state & 4294967291) >>> 0;
       future._setError$1(this._resultOrListeners);
@@ -2320,11 +2310,11 @@ $$._FutureImpl = {"": "Object;_state@,_resultOrListeners<",
         result._chain$1(this);
         return;
       } else {
-        result.then$2$onError(this.get$_liblib3$_setValue(), this.get$_setError());
+        result.then$2$onError(this.get$_liblib0$_setValue(), this.get$_setError());
         return;
       }
     else
-      this._liblib3$_setValue$1(result);
+      this._liblib0$_setValue$1(result);
   },
   _asListener$0: function() {
     return $._FutureListenerWrapper$(this, null);
@@ -2444,7 +2434,7 @@ $$._CatchErrorFuture = {"": "_TransformFuture;_test,_onError,_nextListener,_stat
     return this._onError.call$1(arg0);
   },
   _sendValue$1: function(value) {
-    this._liblib3$_setValue$1(value);
+    this._liblib0$_setValue$1(value);
   },
   _sendError$1: function(error) {
     var matchesTest, e, s, result, e0, e1, s0, exception, t1;
@@ -2549,6 +2539,16 @@ $$.Stream = {"": "Object;",
     this.listen$4$onDone$onError$unsubscribeOnError(t2, new $.Stream_length_anon0(t1, future), t3, true);
     return future;
   },
+  get$isEmpty: function(_) {
+    var t1, future, t2, t3;
+    t1 = {};
+    future = $._FutureImpl$($.bool);
+    t1.subscription_0 = null;
+    t2 = new $.Stream_isEmpty_anon(t1, future);
+    t3 = future.get$_setError();
+    t1.subscription_0 = this.listen$4$onDone$onError$unsubscribeOnError(t2, new $.Stream_isEmpty_anon0(future), t3, true);
+    return future;
+  },
   toList$0: function(_) {
     var result, future, t1, t2;
     result = [];
@@ -2567,6 +2567,20 @@ $$.Stream = {"": "Object;",
     t3 = future.get$_setError();
     t1.subscription_0 = this.listen$4$onDone$onError$unsubscribeOnError(t2, new $.Stream_first_anon0(future), t3, true);
     return future;
+  },
+  elementAt$1: function(_, index) {
+    var t1, t2, future, t3;
+    t1 = {};
+    t1.index_0 = index;
+    t2 = t1.index_0;
+    if (!(typeof t2 === "number" && Math.floor(t2) === t2) || $.$lt$n(t2, 0))
+      throw $.$$throw($.ArgumentError$(t1.index_0));
+    future = $._FutureImpl$($.getRuntimeTypeArgument(this, this["$asStream"], 0));
+    t1.subscription_1 = null;
+    t2 = new $.Stream_elementAt_anon(t1, future);
+    t3 = future.get$_setError();
+    t1.subscription_1 = this.listen$4$onDone$onError$unsubscribeOnError(t2, new $.Stream_elementAt_anon0(future), t3, true);
+    return future;
   }
 };
 
@@ -2579,7 +2593,21 @@ $$.Stream_length_anon = {"": "Closure;box_0",
 
 $$.Stream_length_anon0 = {"": "Closure;box_0,future_1",
   call$0: function() {
-    this.future_1._liblib3$_setValue$1(this.box_0.count_0);
+    this.future_1._liblib0$_setValue$1(this.box_0.count_0);
+  }
+};
+
+$$.Stream_isEmpty_anon = {"": "Closure;box_0,future_1",
+  call$1: function(_) {
+    var t1 = this.box_0.subscription_0;
+    t1.cancel$0(t1);
+    this.future_1._liblib0$_setValue$1(false);
+  }
+};
+
+$$.Stream_isEmpty_anon0 = {"": "Closure;future_2",
+  call$0: function() {
+    this.future_2._liblib0$_setValue$1(true);
   }
 };
 
@@ -2591,14 +2619,14 @@ $$.Stream_toList_anon = {"": "Closure;result_0",
 
 $$.Stream_toList_anon0 = {"": "Closure;result_1,future_2",
   call$0: function() {
-    this.future_2._liblib3$_setValue$1(this.result_1);
+    this.future_2._liblib0$_setValue$1(this.result_1);
   }
 };
 
 $$.Stream_first_anon = {"": "Closure;box_0,future_1",
   call$1: function(value) {
     var t1;
-    this.future_1._liblib3$_setValue$1(value);
+    this.future_1._liblib0$_setValue$1(value);
     t1 = this.box_0.subscription_0;
     t1.cancel$0(t1);
     return;
@@ -2608,6 +2636,25 @@ $$.Stream_first_anon = {"": "Closure;box_0,future_1",
 $$.Stream_first_anon0 = {"": "Closure;future_2",
   call$0: function() {
     this.future_2._setError$1($.AsyncError$($.StateError$("No elements"), null));
+  }
+};
+
+$$.Stream_elementAt_anon = {"": "Closure;box_0,future_1",
+  call$1: function(value) {
+    var t1 = this.box_0;
+    if ($.$eq(t1.index_0, 0) === true) {
+      this.future_1._liblib0$_setValue$1(value);
+      t1 = t1.subscription_1;
+      t1.cancel$0(t1);
+      return;
+    }
+    t1.index_0 = $.$sub$n(t1.index_0, 1);
+  }
+};
+
+$$.Stream_elementAt_anon0 = {"": "Closure;future_2",
+  call$0: function() {
+    this.future_2._setError$1($.AsyncError$($.StateError$("Not enough elements for elementAt"), null));
   }
 };
 
@@ -2641,8 +2688,8 @@ $$._ForwardingStream = {"": "Stream;",
 };
 
 $$._BaseStreamSubscription = {"": "Object;",
-  _liblib3$_onData$1: function(arg0) {
-    return this._liblib3$_onData.call$1(arg0);
+  _liblib0$_onData$1: function(arg0) {
+    return this._liblib0$_onData.call$1(arg0);
   },
   _onError$1: function(arg0) {
     return this._onError.call$1(arg0);
@@ -2658,7 +2705,7 @@ $$._BaseStreamSubscription = {"": "Object;",
   }
 };
 
-$$._ForwardingStreamSubscription = {"": "_BaseStreamSubscription;_stream,_unsubscribeOnError,_subscription,_liblib3$_onData,_onError,_onDone",
+$$._ForwardingStreamSubscription = {"": "_BaseStreamSubscription;_stream,_unsubscribeOnError,_subscription,_liblib0$_onData,_onError,_onDone",
   cancel$0: function(_) {
     var t1 = this._subscription;
     if (t1 != null) {
@@ -2667,7 +2714,7 @@ $$._ForwardingStreamSubscription = {"": "_BaseStreamSubscription;_stream,_unsubs
     }
   },
   _sendData$1: function(data) {
-    this._liblib3$_onData$1(data);
+    this._liblib0$_onData$1(data);
   },
   _sendError$1: function(error) {
     var t1;
@@ -2709,12 +2756,12 @@ $$._ForwardingStreamSubscription = {"": "_BaseStreamSubscription;_stream,_unsubs
     var t1, t2;
     t1 = this.get$_handleData();
     t2 = this.get$_handleError();
-    this._subscription = this._stream._liblib3$_source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
+    this._subscription = this._stream._liblib0$_source.listen$3$onDone$onError(t1, this.get$_handleDone(), t2);
   },
   $as_BaseStreamSubscription: function (S, T) { return [T]; }
 };
 
-$$._MapStream = {"": "_ForwardingStream;_transform,_liblib3$_source",
+$$._MapStream = {"": "_ForwardingStream;_transform,_liblib0$_source",
   _transform$1: function(arg0) {
     return this._transform.call$1(arg0);
   },
@@ -2991,6 +3038,9 @@ $$.HashSet = {"": "Collection;_liblib1$_length,_strings,_nums,_rest,_elements",
   },
   get$length: function(_) {
     return this._liblib1$_length;
+  },
+  get$isEmpty: function(_) {
+    return this._liblib1$_length === 0;
   },
   contains$1: function(_, object) {
     var strings, nums, rest;
@@ -3334,15 +3384,15 @@ $$._HashTable = {"": "Object;",
         return offset;
     }
   },
-  _remove$1: function(_, key) {
+  _liblib1$_remove$1: function(_, key) {
     var offset = this._probeForLookup$2($.get$hashCode$(key), key);
     if (typeof offset !== "number")
-      return this._remove$1$bailout(1, offset);
+      return this._liblib1$_remove$1$bailout(1, offset);
     if (offset >= 0)
       this._deleteEntry$1(offset);
     return offset;
   },
-  _remove$1$bailout: function(state0, offset) {
+  _liblib1$_remove$1$bailout: function(state0, offset) {
     if ($.$ge$n(offset, 0))
       this._deleteEntry$1(offset);
     return offset;
@@ -3448,7 +3498,7 @@ $$.LinkedHashMap = {"": "Object;_hashTable<",
   remove$1: function(_, key) {
     var t1, offset, oldValue;
     t1 = this._hashTable;
-    offset = t1._remove$1(t1, key);
+    offset = t1._liblib1$_remove$1(t1, key);
     if (typeof offset !== "number")
       return this.remove$1$bailout(1, t1, offset);
     if (offset < 0)
@@ -3493,6 +3543,9 @@ $$.LinkedHashMap = {"": "Object;_hashTable<",
   },
   get$length: function(_) {
     return this._hashTable.get$_elementCount();
+  },
+  get$isEmpty: function(_) {
+    return this._hashTable.get$_elementCount() === 0;
   },
   toString$0: function(_) {
     var result = $.StringBuffer$("");
@@ -3547,6 +3600,9 @@ $$.LinkedHashSet = {"": "Collection;_table",
   get$length: function(_) {
     return this._table.get$_elementCount();
   },
+  get$isEmpty: function(_) {
+    return this._table.get$_elementCount() === 0;
+  },
   add$1: function(_, element) {
     this._table._put$1(element);
     this._table._checkCapacity$0();
@@ -3562,7 +3618,7 @@ $$.LinkedHashSet = {"": "Collection;_table",
   remove$1: function(_, object) {
     var t1, offset;
     t1 = this._table;
-    offset = t1._remove$1(t1, object);
+    offset = t1._liblib1$_remove$1(t1, object);
     if (typeof offset !== "number")
       return this.remove$1$bailout1(1, offset);
     if (offset >= 0) {
@@ -4245,7 +4301,7 @@ $$.NoSuchMethodError = {"": "Object;_receiver,_memberName,_arguments,_namedArgum
     t1.sb_0 = $.StringBuffer$("");
     t1.i_1 = 0;
     t2 = this._arguments;
-    if (typeof t2 !== "object" || t2 === null || t2.constructor !== Array || !!t2.fixed$length)
+    if (typeof t2 !== "object" || t2 === null || t2.constructor !== Array && !$.getInterceptor(t2).$isJavaScriptIndexingBehavior())
       return this.toString$0$bailout1(1, t1, t2);
     for (; $.$lt$n(t1.i_1, t2.length); t1.i_1 = $.$add$ns(t1.i_1, 1)) {
       if ($.$gt$n(t1.i_1, 0)) {
@@ -4405,6 +4461,9 @@ $$.Iterable = {"": "Object;",
       ++count;
     return count;
   },
+  get$isEmpty: function(_) {
+    return !this.get$iterator(this).moveNext$0();
+  },
   elementAt$1: function(_, index) {
     var t1, remaining, t2;
     if (!(typeof index === "number" && Math.floor(index) === index) || index < 0)
@@ -4506,6 +4565,9 @@ $$.Object = {"": ";",
   createGain$0: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("createGain", "createGain$0", 0, [], []));
   },
+  elementAt$1: function($receiver, $0) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("elementAt", "elementAt$1", 0, [$0], []));
+  },
   endsWith$1: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("endsWith", "endsWith$1", 0, [$0], []));
   },
@@ -4545,17 +4607,14 @@ $$.Object = {"": ";",
   get$gain: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("gain", "get$gain", 1, [], []));
   },
-  get$height: function($receiver) {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("height", "get$height", 1, [], []));
-  },
   get$id: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("id", "get$id", 1, [], []));
   },
+  get$isEmpty: function($receiver) {
+    return this.noSuchMethod$1(this, $.createInvocationMirror("isEmpty", "get$isEmpty", 1, [], []));
+  },
   get$iterator: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("iterator", "get$iterator", 1, [], []));
-  },
-  get$left: function($receiver) {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("left", "get$left", 1, [], []));
   },
   get$length: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("length", "get$length", 1, [], []));
@@ -4575,17 +4634,11 @@ $$.Object = {"": ";",
   get$target: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("target", "get$target", 1, [], []));
   },
-  get$top: function($receiver) {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("top", "get$top", 1, [], []));
-  },
   get$value: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("value", "get$value", 1, [], []));
   },
   get$which: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("which", "get$which", 1, [], []));
-  },
-  get$width: function($receiver) {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("width", "get$width", 1, [], []));
   },
   getChannelData$1: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("getChannelData", "getChannelData$1", 0, [$0], []));
@@ -4605,9 +4658,6 @@ $$.Object = {"": ";",
   postMessage$1: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("postMessage", "postMessage$1", 0, [$0], []));
   },
-  release$0: function($receiver) {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("release", "release$0", 0, [], []));
-  },
   remove$0: function($receiver) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("remove", "remove$0", 0, [], []));
   },
@@ -4626,20 +4676,11 @@ $$.Object = {"": ";",
   set$buffer: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("buffer=", "set$buffer", 2, [$0], []));
   },
-  set$destination: function($receiver, $0) {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("destination=", "set$destination", 2, [$0], []));
-  },
-  set$gain: function($receiver, $0) {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("gain=", "set$gain", 2, [$0], []));
-  },
   set$innerHtml: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("innerHtml=", "set$innerHtml", 2, [$0], []));
   },
   set$loop: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("loop=", "set$loop", 2, [$0], []));
-  },
-  set$playbackRate: function($receiver, $0) {
-    return this.noSuchMethod$1(this, $.createInvocationMirror("playbackRate=", "set$playbackRate", 2, [$0], []));
   },
   set$value: function($receiver, $0) {
     return this.noSuchMethod$1(this, $.createInvocationMirror("value=", "set$value", 2, [$0], []));
@@ -4685,6 +4726,9 @@ $$.Object = {"": ";",
 $$.StringBuffer = {"": "Object;_contents",
   get$length: function(_) {
     return this._contents.length;
+  },
+  get$isEmpty: function(_) {
+    return this.get$length(this) === 0;
   },
   write$1: function(_, obj) {
     if (typeof obj !== "string")
@@ -4787,6 +4831,9 @@ $$._ChildrenElementList = {"": "Object;_element,_childElements",
   map$1: function(_, f) {
     return $.MappedListIterable$(this, f, null, null);
   },
+  get$isEmpty: function(_) {
+    return this._element.firstElementChild == null;
+  },
   elementAt$1: function(_, index) {
     return $.$index$asx(this._childElements, index);
   },
@@ -4871,6 +4918,9 @@ $$._FrozenElementList = {"": "Object;_nodeList",
   elementAt$1: function(_, index) {
     return $.$index$asx(this._nodeList, index);
   },
+  get$isEmpty: function(_) {
+    return $.get$isEmpty$asx(this._nodeList);
+  },
   get$length: function(_) {
     return $.get$length$asx(this._nodeList);
   },
@@ -4928,10 +4978,10 @@ $$._FrozenElementList = {"": "Object;_nodeList",
   }
 };
 
-$$._FrozenElementListIterator = {"": "Object;_list,_liblib4$_index,_current",
+$$._FrozenElementListIterator = {"": "Object;_list,_liblib$_index,_liblib$_current",
   moveNext$0: function() {
     var t1, nextIndex, t2;
-    t1 = this._liblib4$_index;
+    t1 = this._liblib$_index;
     if (typeof t1 !== "number")
       return this.moveNext$0$bailout(1, t1);
     nextIndex = t1 + 1;
@@ -4940,18 +4990,18 @@ $$._FrozenElementListIterator = {"": "Object;_list,_liblib4$_index,_current",
     if (typeof t2 !== "number")
       return this.moveNext$0$bailout(2, t1, t2, nextIndex);
     if (nextIndex < t2) {
-      this._current = t1.$index(t1, nextIndex);
-      this._liblib4$_index = nextIndex;
+      this._liblib$_current = t1.$index(t1, nextIndex);
+      this._liblib$_index = nextIndex;
       return true;
     }
-    this._liblib4$_index = t1.get$length(t1);
-    this._current = null;
+    this._liblib$_index = t1.get$length(t1);
+    this._liblib$_current = null;
     return false;
   },
   moveNext$0$bailout: function(state0, t1, t2, nextIndex) {
     switch (state0) {
       case 0:
-        t1 = this._liblib4$_index;
+        t1 = this._liblib$_index;
       case 1:
         state0 = 0;
         nextIndex = $.$add$ns(t1, 1);
@@ -4960,17 +5010,17 @@ $$._FrozenElementListIterator = {"": "Object;_list,_liblib4$_index,_current",
       case 2:
         state0 = 0;
         if ($.$lt$n(nextIndex, t2)) {
-          this._current = t1.$index(t1, nextIndex);
-          this._liblib4$_index = nextIndex;
+          this._liblib$_current = t1.$index(t1, nextIndex);
+          this._liblib$_index = nextIndex;
           return true;
         }
-        this._liblib4$_index = t1.get$length(t1);
-        this._current = null;
+        this._liblib$_index = t1.get$length(t1);
+        this._liblib$_current = null;
         return false;
     }
   },
   get$current: function() {
-    return this._current;
+    return this._liblib$_current;
   }
 };
 
@@ -5097,6 +5147,9 @@ $$._ChildNodeListLazy = {"": "Object;_this",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(_) {
+    return $.$eq(this.get$length(this), 0);
+  },
   elementAt$1: function(_, index) {
     return $.$index$asx(this._this.childNodes, index);
   },
@@ -5185,6 +5238,9 @@ $$._AttributeMap = {"": "Object;",
         values.push($.get$value$x(t1.$index(attributes, i)));
     return values;
   },
+  get$isEmpty: function(_) {
+    return this.get$length(this) === 0;
+  },
   $isMap: function() {
     return true;
   },
@@ -5234,6 +5290,10 @@ $$.CssClassSet = {"": "Object;",
   map$1: function(_, f) {
     var t1 = this.readClasses$0();
     return t1.map$1(t1, f);
+  },
+  get$isEmpty: function(_) {
+    var t1 = this.readClasses$0();
+    return t1.get$isEmpty(t1);
   },
   get$length: function(_) {
     var t1 = this.readClasses$0();
@@ -5361,17 +5421,17 @@ $$.Rect = {"": "Object;left>,top>,width>,height>",
   }
 };
 
-$$._JsSerializer0 = {"": "_Serializer0;_liblib4$_nextFreeRefId,_liblib4$_visited",
+$$._JsSerializer0 = {"": "_Serializer0;_liblib$_nextFreeRefId,_liblib$_visited",
   visitSendPortSync$1: function(x) {
     if (!!$.getInterceptor(x).$is_JsSendPortSync)
-      return ["sendport", "nativejs", x._liblib4$_id];
+      return ["sendport", "nativejs", x._liblib$_id];
     if (!!$.getInterceptor(x).$is_LocalSendPortSync) {
       if ($.ReceivePortSync__cachedIsolateId == null)
         $.ReceivePortSync__cachedIsolateId = $._getNewIsolateId();
-      return ["sendport", "dart", $.ReceivePortSync__cachedIsolateId, x._liblib4$_receivePort._portId];
+      return ["sendport", "dart", $.ReceivePortSync__cachedIsolateId, x._liblib$_receivePort._portId];
     }
     if (!!$.getInterceptor(x).$is_RemoteSendPortSync)
-      return ["sendport", "dart", x._liblib4$_isolateId, x._portId];
+      return ["sendport", "dart", x._liblib$_isolateId, x._portId];
     throw $.$$throw("Unknown port type " + $.S(x));
   },
   visitSendPort$1: function(x) {
@@ -5379,7 +5439,7 @@ $$._JsSerializer0 = {"": "_Serializer0;_liblib4$_nextFreeRefId,_liblib4$_visited
   }
 };
 
-$$._JsDeserializer0 = {"": "_Deserializer0;_liblib4$_deserialized",
+$$._JsDeserializer0 = {"": "_Deserializer0;_liblib$_deserialized",
   deserializeSendPort$1: function(x) {
     var t1, tag;
     t1 = $.getInterceptor$asx(x);
@@ -5395,28 +5455,28 @@ $$._JsDeserializer0 = {"": "_Deserializer0;_liblib4$_deserialized",
   }
 };
 
-$$._JsSendPortSync = {"": "Object;_liblib4$_id",
+$$._JsSendPortSync = {"": "Object;_liblib$_id",
   callSync$1: function(message) {
-    var result = ReceivePortSync.dispatchCall(this._liblib4$_id, $._JsSerializer$0().traverse$1(message));
+    var result = ReceivePortSync.dispatchCall(this._liblib$_id, $._JsSerializer$0().traverse$1(message));
     return $._JsDeserializer$0().deserialize$1(result);
   },
   $eq: function(_, other) {
     if (other == null)
       return false;
-    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_JsSendPortSync && $.$eq(this._liblib4$_id, other._liblib4$_id) === true;
+    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_JsSendPortSync && $.$eq(this._liblib$_id, other._liblib$_id) === true;
   },
   get$hashCode: function(_) {
-    return this._liblib4$_id;
+    return this._liblib$_id;
   },
   $is_JsSendPortSync: true,
   $isSendPortSync: true
 };
 
-$$._RemoteSendPortSync = {"": "Object;_liblib4$_isolateId,_portId",
+$$._RemoteSendPortSync = {"": "Object;_liblib$_isolateId,_portId",
   callSync$1: function(message) {
     var serialized, result;
     serialized = $._JsSerializer$0().traverse$1(message);
-    result = $._RemoteSendPortSync__call(this._liblib4$_isolateId, this._portId, serialized);
+    result = $._RemoteSendPortSync__call(this._liblib$_isolateId, this._portId, serialized);
     return $._JsDeserializer$0().deserialize$1(result);
   },
   $eq: function(_, other) {
@@ -5424,7 +5484,7 @@ $$._RemoteSendPortSync = {"": "Object;_liblib4$_isolateId,_portId",
     if (other == null)
       return false;
     if (typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_RemoteSendPortSync)
-      t1 = $.$eq(this._liblib4$_isolateId, other._liblib4$_isolateId) === true && $.$eq(this._portId, other._portId) === true;
+      t1 = $.$eq(this._liblib$_isolateId, other._liblib$_isolateId) === true && $.$eq(this._portId, other._portId) === true;
     else
       t1 = false;
     return t1;
@@ -5433,7 +5493,7 @@ $$._RemoteSendPortSync = {"": "Object;_liblib4$_isolateId,_portId",
     var t1 = this._portId;
     if (typeof t1 !== "number")
       throw $.iae(t1);
-    return $.$shr$n(this._liblib4$_isolateId, 16 + t1);
+    return $.$shr$n(this._liblib$_isolateId, 16 + t1);
   },
   $is_RemoteSendPortSync: true,
   $isSendPortSync: true
@@ -5446,37 +5506,37 @@ $$._RemoteSendPortSync__call_anon = {"": "Closure;box_0",
   }
 };
 
-$$._LocalSendPortSync = {"": "Object;_liblib4$_receivePort",
+$$._LocalSendPortSync = {"": "Object;_liblib$_receivePort",
   callSync$1: function(message) {
     var t1, result;
     t1 = $._JsSerializer$0().traverse$1(message);
-    result = this._liblib4$_receivePort._callback$1($._JsDeserializer$0().deserialize$1(t1));
+    result = this._liblib$_receivePort._liblib$_callback$1($._JsDeserializer$0().deserialize$1(t1));
     t1 = $._JsSerializer$0().traverse$1(result);
     return $._JsDeserializer$0().deserialize$1(t1);
   },
   $eq: function(_, other) {
     if (other == null)
       return false;
-    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_LocalSendPortSync && this._liblib4$_receivePort === other._liblib4$_receivePort;
+    return typeof other === "object" && other !== null && !!$.getInterceptor(other).$is_LocalSendPortSync && this._liblib$_receivePort === other._liblib$_receivePort;
   },
   get$hashCode: function(_) {
-    var t1 = this._liblib4$_receivePort;
+    var t1 = this._liblib$_receivePort;
     return t1.get$hashCode(t1);
   },
   $is_LocalSendPortSync: true,
   $isSendPortSync: true
 };
 
-$$.ReceivePortSync = {"": "Object;_portId,_callback,_portSubscription",
-  _callback$1: function(arg0) {
-    return this._callback.call$1(arg0);
+$$.ReceivePortSync = {"": "Object;_portId,_liblib$_callback,_portSubscription",
+  _liblib$_callback$1: function(arg0) {
+    return this._liblib$_callback.call$1(arg0);
   },
   get$_listenerName: function() {
     return $.ReceivePortSync__getListenerName($.ReceivePortSync__isolateId(), this._portId);
   },
   receive$1: function(callback) {
     var t1;
-    this._callback = callback;
+    this._liblib$_callback = callback;
     if (this._portSubscription == null) {
       t1 = $.get$on$x(window);
       this._portSubscription = t1.$index(t1, this.get$_listenerName()).listen$1(new $.ReceivePortSync_receive_anon(this));
@@ -5505,7 +5565,7 @@ $$.ReceivePortSync_receive_anon = {"": "Closure;this_0",
     replyTo = t1.$index(data, 0);
     t1 = t1.$index(data, 1);
     message = $._JsDeserializer$0().deserialize$1(t1);
-    result = this.this_0._callback$1(message);
+    result = this.this_0._liblib$_callback$1(message);
     t1 = $._JsSerializer$0().traverse$1(result);
     output = $.StringBuffer$("");
     $._JsonStringifier$(output).stringifyValue$1(t1);
@@ -5534,17 +5594,17 @@ $$._MessageTraverser0 = {"": "Object;",
     t1 = x;
     if (t1 == null || typeof t1 === "string" || typeof t1 === "number" || typeof t1 === "boolean")
       return this.visitPrimitive$1(x);
-    t1 = this._liblib4$_visited;
+    t1 = this._liblib$_visited;
     t1.reset$0(t1);
     result = null;
     try {
-      result = this._liblib4$_dispatch$1(x);
+      result = this._liblib$_dispatch$1(x);
     } finally {
       t1.cleanup$0();
     }
     return result;
   },
-  _liblib4$_dispatch$1: function(x) {
+  _liblib$_dispatch$1: function(x) {
     if (x == null || typeof x === "string" || typeof x === "number" || typeof x === "boolean")
       return this.visitPrimitive$1(x);
     if (typeof x === "object" && x !== null && (x.constructor === Array || $.getInterceptor(x).$isList()))
@@ -5568,44 +5628,44 @@ $$._Serializer0 = {"": "_MessageTraverser0;",
   },
   visitList$1: function(list) {
     var t1, copyId, id;
-    t1 = this._liblib4$_visited;
+    t1 = this._liblib$_visited;
     copyId = t1.$index(t1, list);
     if (copyId != null)
       return ["ref", copyId];
-    id = this._liblib4$_nextFreeRefId;
-    this._liblib4$_nextFreeRefId = id + 1;
+    id = this._liblib$_nextFreeRefId;
+    this._liblib$_nextFreeRefId = id + 1;
     t1.$indexSet(t1, list, id);
-    return ["list", id, this._liblib4$_serializeList$1(list)];
+    return ["list", id, this._liblib$_serializeList$1(list)];
   },
   visitMap$1: function(map) {
     var t1, copyId, id;
-    t1 = this._liblib4$_visited;
+    t1 = this._liblib$_visited;
     copyId = t1.$index(t1, map);
     if (copyId != null)
       return ["ref", copyId];
-    id = this._liblib4$_nextFreeRefId;
-    this._liblib4$_nextFreeRefId = id + 1;
+    id = this._liblib$_nextFreeRefId;
+    this._liblib$_nextFreeRefId = id + 1;
     t1.$indexSet(t1, map, id);
     t1 = $.getInterceptor$x(map);
-    return ["map", id, this._liblib4$_serializeList$1($.toList$0$ax(t1.get$keys(map))), this._liblib4$_serializeList$1($.toList$0$ax(t1.get$values(map)))];
+    return ["map", id, this._liblib$_serializeList$1($.toList$0$ax(t1.get$keys(map))), this._liblib$_serializeList$1($.toList$0$ax(t1.get$values(map)))];
   },
-  _liblib4$_serializeList$1: function(list) {
+  _liblib$_serializeList$1: function(list) {
     var len, result, t1, i, t2;
     if (typeof list !== "string" && (typeof list !== "object" || list === null || list.constructor !== Array && !$.getInterceptor(list).$isJavaScriptIndexingBehavior()))
-      return this._liblib4$_serializeList$1$bailout(1, list);
+      return this._liblib$_serializeList$1$bailout(1, list);
     len = list.length;
     result = $.List_List(len, null);
     for (t1 = result.length, i = 0; i < len; ++i) {
       if (i >= list.length)
         throw $.ioore(i);
-      t2 = this._liblib4$_dispatch$1(list[i]);
+      t2 = this._liblib$_dispatch$1(list[i]);
       if (i >= t1)
         throw $.ioore(i);
       result[i] = t2;
     }
     return result;
   },
-  _liblib4$_serializeList$1$bailout: function(state0, list, t1, len) {
+  _liblib$_serializeList$1$bailout: function(state0, list, t1, len) {
     switch (state0) {
       case 0:
       case 1:
@@ -5617,7 +5677,7 @@ $$._Serializer0 = {"": "_MessageTraverser0;",
         state0 = 0;
         result = $.List_List(len, null);
         for (t2 = result.length, i = 0; $.JSNumber_methods.$lt(i, len); ++i) {
-          t3 = this._liblib4$_dispatch$1(t1.$index(list, i));
+          t3 = this._liblib$_dispatch$1(t1.$index(list, i));
           if (i >= t2)
             throw $.ioore(i);
           result[i] = t3;
@@ -5631,10 +5691,10 @@ $$._Deserializer0 = {"": "Object;",
   deserialize$1: function(x) {
     if (x == null || typeof x === "string" || typeof x === "number" || typeof x === "boolean")
       return x;
-    this._liblib4$_deserialized = $.HashMap$(null, null);
-    return this._liblib4$_deserializeHelper$1(x);
+    this._liblib$_deserialized = $.HashMap$(null, null);
+    return this._liblib$_deserializeHelper$1(x);
   },
-  _liblib4$_deserializeHelper$1: function(x) {
+  _liblib$_deserializeHelper$1: function(x) {
     var t1, id;
     t1 = $.getInterceptor(x);
     if (x == null || typeof x === "string" || typeof x === "number" || typeof x === "boolean")
@@ -5642,79 +5702,79 @@ $$._Deserializer0 = {"": "Object;",
     switch (t1.$index(x, 0)) {
       case "ref":
         id = t1.$index(x, 1);
-        t1 = this._liblib4$_deserialized;
+        t1 = this._liblib$_deserialized;
         return t1.$index(t1, id);
       case "list":
-        return this._liblib4$_deserializeList$1(x);
+        return this._liblib$_deserializeList$1(x);
       case "map":
-        return this._liblib4$_deserializeMap$1(x);
+        return this._liblib$_deserializeMap$1(x);
       case "sendport":
         return this.deserializeSendPort$1(x);
       default:
         return this.deserializeObject$1(x);
     }
   },
-  _liblib4$_deserializeList$1: function(x) {
+  _liblib$_deserializeList$1: function(x) {
     var t1, id, dartList, t2, len, i;
     t1 = $.getInterceptor$asx(x);
     id = t1.$index(x, 1);
     dartList = t1.$index(x, 2);
     if (typeof dartList !== "object" || dartList === null || (dartList.constructor !== Array || !!dartList.immutable$list) && !$.getInterceptor(dartList).$isJavaScriptIndexingBehavior())
-      return this._liblib4$_deserializeList$1$bailout(1, dartList, id);
-    t2 = this._liblib4$_deserialized;
+      return this._liblib$_deserializeList$1$bailout(1, dartList, id);
+    t2 = this._liblib$_deserialized;
     t2.$indexSet(t2, id, dartList);
     len = dartList.length;
     for (i = 0; i < len; ++i) {
       if (i >= dartList.length)
         throw $.ioore(i);
-      t1 = this._liblib4$_deserializeHelper$1(dartList[i]);
+      t1 = this._liblib$_deserializeHelper$1(dartList[i]);
       if (i >= dartList.length)
         throw $.ioore(i);
       dartList[i] = t1;
     }
     return dartList;
   },
-  _liblib4$_deserializeList$1$bailout: function(state0, dartList, id) {
+  _liblib$_deserializeList$1$bailout: function(state0, dartList, id) {
     var t2, len, i;
-    t2 = this._liblib4$_deserialized;
+    t2 = this._liblib$_deserialized;
     t2.$indexSet(t2, id, dartList);
     t2 = $.getInterceptor$asx(dartList);
     len = t2.get$length(dartList);
     for (i = 0; $.JSNumber_methods.$lt(i, len); ++i)
-      t2.$indexSet(dartList, i, this._liblib4$_deserializeHelper$1(t2.$index(dartList, i)));
+      t2.$indexSet(dartList, i, this._liblib$_deserializeHelper$1(t2.$index(dartList, i)));
     return dartList;
   },
-  _liblib4$_deserializeMap$1: function(x) {
+  _liblib$_deserializeMap$1: function(x) {
     var result, t1, id, t2, keys, values, len, i, key;
     result = $.HashMap$(null, null);
     t1 = $.getInterceptor$asx(x);
     id = t1.$index(x, 1);
-    t2 = this._liblib4$_deserialized;
+    t2 = this._liblib$_deserialized;
     t2.$indexSet(t2, id, result);
     keys = t1.$index(x, 2);
     if (typeof keys !== "string" && (typeof keys !== "object" || keys === null || keys.constructor !== Array && !$.getInterceptor(keys).$isJavaScriptIndexingBehavior()))
-      return this._liblib4$_deserializeMap$1$bailout(1, keys, t1, x, result);
+      return this._liblib$_deserializeMap$1$bailout(1, keys, t1, x, result);
     values = t1.$index(x, 3);
     if (typeof values !== "string" && (typeof values !== "object" || values === null || values.constructor !== Array && !$.getInterceptor(values).$isJavaScriptIndexingBehavior()))
-      return this._liblib4$_deserializeMap$1$bailout(2, keys, 0, 0, result, values);
+      return this._liblib$_deserializeMap$1$bailout(2, keys, 0, 0, result, values);
     len = keys.length;
     for (i = 0; i < len; ++i) {
       if (i >= keys.length)
         throw $.ioore(i);
-      key = this._liblib4$_deserializeHelper$1(keys[i]);
+      key = this._liblib$_deserializeHelper$1(keys[i]);
       if (i >= values.length)
         throw $.ioore(i);
-      result.$indexSet(result, key, this._liblib4$_deserializeHelper$1(values[i]));
+      result.$indexSet(result, key, this._liblib$_deserializeHelper$1(values[i]));
     }
     return result;
   },
-  _liblib4$_deserializeMap$1$bailout: function(state0, keys, t1, x, result, values, t3, len) {
+  _liblib$_deserializeMap$1$bailout: function(state0, keys, t1, x, result, values, t3, len) {
     switch (state0) {
       case 0:
         result = $.HashMap$(null, null);
         t1 = $.getInterceptor$asx(x);
         id = t1.$index(x, 1);
-        t2 = this._liblib4$_deserialized;
+        t2 = this._liblib$_deserialized;
         t2.$indexSet(t2, id, result);
         keys = t1.$index(x, 2);
       case 1:
@@ -5728,7 +5788,7 @@ $$._Deserializer0 = {"": "Object;",
         var id, t2, i;
         state0 = 0;
         for (t1 = $.getInterceptor$asx(values), i = 0; $.JSNumber_methods.$lt(i, len); ++i)
-          result.$indexSet(result, this._liblib4$_deserializeHelper$1(t3.$index(keys, i)), this._liblib4$_deserializeHelper$1(t1.$index(values, i)));
+          result.$indexSet(result, this._liblib$_deserializeHelper$1(t3.$index(keys, i)), this._liblib$_deserializeHelper$1(t1.$index(values, i)));
         return result;
     }
   },
@@ -5743,22 +5803,22 @@ $$._DOMWindowCrossFrame = {"": "Object;_window",
   }
 };
 
-$$.FixedSizeListIterator = {"": "Object;_array,_length,_position,_current",
+$$.FixedSizeListIterator = {"": "Object;_array,_liblib$_length,_position,_liblib$_current",
   moveNext$0: function() {
     var t1, nextPosition;
     t1 = this._position;
     if (typeof t1 !== "number")
       return this.moveNext$0$bailout(1, t1);
     nextPosition = t1 + 1;
-    t1 = this._length;
+    t1 = this._liblib$_length;
     if (t1 !== (t1 | 0))
       return this.moveNext$0$bailout(2, t1, nextPosition);
     if (nextPosition < t1) {
-      this._current = $.$index$asx(this._array, nextPosition);
+      this._liblib$_current = $.$index$asx(this._array, nextPosition);
       this._position = nextPosition;
       return true;
     }
-    this._current = null;
+    this._liblib$_current = null;
     this._position = t1;
     return false;
   },
@@ -5769,21 +5829,21 @@ $$.FixedSizeListIterator = {"": "Object;_array,_length,_position,_current",
       case 1:
         state0 = 0;
         nextPosition = $.$add$ns(t1, 1);
-        t1 = this._length;
+        t1 = this._liblib$_length;
       case 2:
         state0 = 0;
         if ($.$lt$n(nextPosition, t1)) {
-          this._current = $.$index$asx(this._array, nextPosition);
+          this._liblib$_current = $.$index$asx(this._array, nextPosition);
           this._position = nextPosition;
           return true;
         }
-        this._current = null;
+        this._liblib$_current = null;
         this._position = t1;
         return false;
     }
   },
   get$current: function() {
-    return this._current;
+    return this._liblib$_current;
   }
 };
 
@@ -6248,6 +6308,9 @@ $$.FilteredElementList = {"": "Object;_node,_childNodes",
       throw $.ioore(index);
     return t1[index];
   },
+  get$isEmpty: function(_) {
+    return $.JSArray_methods.get$isEmpty(this.get$_filtered());
+  },
   get$length: function(_) {
     return this.get$_filtered().length;
   },
@@ -6526,10 +6589,10 @@ $$._JsonStringifier_stringifyJsonValue_anon = {"": "Closure;box_0,this_1",
   }
 };
 
-$$._AttributeClassSet = {"": "CssClassSet;_liblib5$_element",
+$$._AttributeClassSet = {"": "CssClassSet;_liblib3$_element",
   readClasses$0: function() {
     var t1, classname, s, trimmed;
-    t1 = $.get$attributes$x(this._liblib5$_element);
+    t1 = $.get$attributes$x(this._liblib3$_element);
     classname = t1.$index(t1, "class");
     s = $.LinkedHashSet$($.String);
     if (classname == null)
@@ -6542,7 +6605,7 @@ $$._AttributeClassSet = {"": "CssClassSet;_liblib5$_element",
     return s;
   },
   writeClasses$1: function(s) {
-    var t1 = $.get$attributes$x(this._liblib5$_element);
+    var t1 = $.get$attributes$x(this._liblib3$_element);
     t1.$indexSet(t1, "class", s.join$1(s, " "));
   }
 };
@@ -6565,7 +6628,18 @@ $$._initialize_anon0 = {"": "Closure;",
   }
 };
 
-$$.Proxy = {"": "Object;_port,_liblib$_id",
+$$._enterScopeIfNeeded_anon = {"": "Closure;depth_0",
+  call$0: function() {
+    this.depth_0;
+    $._jsExitJavaScriptScope.callSync$1([]);
+    $.get$_proxiedObjectTable().exitScope$0();
+    return;
+  }
+};
+
+$$._Undefined = {"": "Object;"};
+
+$$.Proxy = {"": "Object;_liblib2$_port,_liblib2$_id",
   toJs$0: function() {
     return this;
   },
@@ -6616,7 +6690,7 @@ $$.Proxy = {"": "Object;_port,_liblib$_id",
         member = t1.substring$1(member, 4);
         kind = "set";
       } else
-        kind = "method";
+        kind = t1.$eq(member, "call") === true ? "apply" : "method";
     }
     return $.Proxy__forward(this, member, kind, args);
   },
@@ -6625,22 +6699,28 @@ $$.Proxy = {"": "Object;_port,_liblib$_id",
   $asSerializable: function () { return [$.Proxy]; }
 };
 
-$$.FunctionProxy = {"": "Proxy;_port,_liblib$_id",
-  noSuchMethod$1: function(_, invocation) {
-    var t1, result;
-    if (invocation.get$isMethod() === true && $.$eq(invocation.memberName, "call") === true) {
-      t1 = $.map$1$ax(invocation.get$positionalArguments(), $._serialize);
-      result = this._port.callSync$1([this._liblib$_id, "", "apply", t1.toList$0(t1)]);
-      t1 = $.getInterceptor$asx(result);
-      if ($.$eq(t1.$index(result, 0), "throws") === true)
-        throw $.$$throw(t1.$index(result, 1));
-      return $._deserialize(t1.$index(result, 1));
-    } else
-      return $.Proxy.prototype.noSuchMethod$1.call(this, this, invocation);
+$$.FunctionProxy = {"": "Proxy;_liblib2$_port,_liblib2$_id",
+  call$6: function(arg1, arg2, arg3, arg4, arg5, arg6) {
+    return $.Proxy__forward(this, "", "apply", $._pruneUndefined(arg1, arg2, arg3, arg4, arg5, arg6));
+  },
+  call$0: function() {
+    return this.call$6($.C__Undefined, $.C__Undefined, $.C__Undefined, $.C__Undefined, $.C__Undefined, $.C__Undefined);
+  },
+  call$1: function(arg1) {
+    return this.call$6(arg1, $.C__Undefined, $.C__Undefined, $.C__Undefined, $.C__Undefined, $.C__Undefined);
+  },
+  call$2: function(arg1, arg2) {
+    return this.call$6(arg1, arg2, $.C__Undefined, $.C__Undefined, $.C__Undefined, $.C__Undefined);
+  },
+  call$3: function(arg1, arg2, arg3) {
+    return this.call$6(arg1, arg2, arg3, $.C__Undefined, $.C__Undefined, $.C__Undefined);
+  },
+  call$4: function(arg1, arg2, arg3, arg4) {
+    return this.call$6(arg1, arg2, arg3, arg4, $.C__Undefined, $.C__Undefined);
   }
 };
 
-$$._ProxiedObjectTable = {"": "Object;_name,_nextId,_liblib$_deletedCount,_registry<,_port,_globalIds,_handleStack,_scopeIndices<",
+$$._ProxiedObjectTable = {"": "Object;_name,_nextId,_liblib2$_deletedCount,_registry<,_liblib2$_port,_globalIds,_handleStack,_scopeIndices<",
   enterScope$0: function() {
     this._scopeIndices.push(this._handleStack.length);
   },
@@ -6659,7 +6739,7 @@ $$._ProxiedObjectTable = {"": "Object;_name,_nextId,_liblib$_deletedCount,_regis
         if (i >= t2.length)
           throw $.ioore(i);
         t1.remove$1(t1, t2[i]);
-        this._liblib$_deletedCount = this._liblib$_deletedCount + 1;
+        this._liblib2$_deletedCount = this._liblib2$_deletedCount + 1;
       }
     }
     $.JSArray_methods.removeRange$2(t2, start, t4 - start);
@@ -6675,7 +6755,7 @@ $$._ProxiedObjectTable = {"": "Object;_name,_nextId,_liblib$_deletedCount,_regis
         if (i >= t2.length)
           throw $.ioore(i);
         t1.remove$1(t1, t2[i]);
-        this._liblib$_deletedCount = this._liblib$_deletedCount + 1;
+        this._liblib2$_deletedCount = this._liblib2$_deletedCount + 1;
       }
     }
     if (typeof start !== "number")
@@ -6700,10 +6780,10 @@ $$._ProxiedObjectTable = {"": "Object;_name,_nextId,_liblib$_deletedCount,_regis
     return t1.$index(t1, id);
   },
   get$sendPort: function() {
-    return this._port.toSendPort$0();
+    return this._liblib2$_port.toSendPort$0();
   },
   _ProxiedObjectTable$0: function() {
-    this._port.receive$1(new $.anon(this));
+    this._liblib2$_port.receive$1(new $.anon(this));
   }
 };
 
@@ -6762,244 +6842,111 @@ $$.Wrapper = {"": "Object;_inner<",
     this._inner = null;
   },
   toString$0: function(_) {
+    var val;
     if (this._inner == null)
       return $.S(this.get$runtimeType(this)) + "(null)";
-    return $.scoped(new $.Wrapper_toString_anon(this));
+    $._enterScopeIfNeeded();
+    val = $.getString$1$x($._deserialize($._jsPortSync.callSync$1([])), this._inner);
+    return $.S(this.get$runtimeType(this)) + "(" + $.S(val) + ")";
   },
   Wrapper$1: function(inner) {
     this._inner = $.retain(inner);
   }
 };
 
-$$.Wrapper_toString_anon = {"": "Closure;this_0",
-  call$0: function() {
-    var t1, t2, val;
-    t1 = $.context0();
-    t2 = this.this_0;
-    val = $.getString$1$x(t1, t2.get$_inner());
-    return $.S($.get$runtimeType$(t2)) + "(" + $.S(val) + ")";
-  }
-};
-
-$$.AudioContext = {"": "Wrapper;destination*,_inner",
+$$.AudioContext = {"": "Wrapper;destination>,_inner",
   get$currentTime: function(_) {
-    return $.scoped(new $.AudioContext_currentTime_anon(this));
+    return $.get$currentTime$x(this._inner);
   },
   get$sampleRate: function(_) {
-    return $.scoped(new $.AudioContext_sampleRate_anon(this));
+    return $.get$sampleRate$x(this._inner);
   },
   createBuffer$3: function(_, numberOfChannels, $length, sampleRate) {
-    return $.scoped(new $.AudioContext_createBuffer_anon(this, numberOfChannels, $length, sampleRate));
+    return $.AudioBuffer$($.createBuffer$3$x(this._inner, numberOfChannels, $length, sampleRate));
   },
   createBufferSource$0: function(_) {
-    return $.scoped(new $.AudioContext_createBufferSource_anon(this));
+    return $.AudioBufferSourceNode$($.createBufferSource$0$x(this._inner));
   },
   createGain$0: function(_) {
-    return $.scoped(new $.AudioContext_createGain_anon(this));
+    return $.GainNode$($.createGain$0$x(this._inner));
   },
   AudioContext$0: function() {
-    $.scoped(new $.anon3(this));
-  }
-};
-
-$$.anon2 = {"": "Closure;",
-  call$0: function() {
-    var t1 = $.context0().createAudioContext$0();
-    $._jsGlobalize.callSync$1($._serialize(t1.toJs$0()));
-    return t1;
-  }
-};
-
-$$.anon3 = {"": "Closure;this_0",
-  call$0: function() {
-    var t1 = this.this_0;
-    $.set$destination$x(t1, $.AudioDestinationNode$($.get$destination$x(t1.get$_inner())));
-  }
-};
-
-$$.AudioContext_currentTime_anon = {"": "Closure;this_0",
-  call$0: function() {
-    return $.get$currentTime$x(this.this_0.get$_inner());
-  }
-};
-
-$$.AudioContext_sampleRate_anon = {"": "Closure;this_0",
-  call$0: function() {
-    return $.get$sampleRate$x(this.this_0.get$_inner());
-  }
-};
-
-$$.AudioContext_createBuffer_anon = {"": "Closure;this_0,numberOfChannels_1,length_2,sampleRate_3",
-  call$0: function() {
-    return $.AudioBuffer$($.createBuffer$3$x(this.this_0.get$_inner(), this.numberOfChannels_1, this.length_2, this.sampleRate_3));
-  }
-};
-
-$$.AudioContext_createBufferSource_anon = {"": "Closure;this_0",
-  call$0: function() {
-    return $.AudioBufferSourceNode$($.createBufferSource$0$x(this.this_0.get$_inner()));
-  }
-};
-
-$$.AudioContext_createGain_anon = {"": "Closure;this_0",
-  call$0: function() {
-    return $.GainNode$($.createGain$0$x(this.this_0.get$_inner()));
+    this.destination = $.AudioDestinationNode$($.get$destination$x(this._inner));
   }
 };
 
 $$.AudioBuffer = {"": "Wrapper;_inner",
   getChannelData$1: function(_, channel) {
-    return $.scoped(new $.AudioBuffer_getChannelData_anon(this, channel));
-  }
-};
-
-$$.AudioBuffer_getChannelData_anon = {"": "Closure;this_0,channel_1",
-  call$0: function() {
-    return $.ChannelData$($.getChannelData$1$x(this.this_0.get$_inner(), this.channel_1));
+    return $.ChannelData$($.getChannelData$1$x(this._inner, channel));
   }
 };
 
 $$.ChannelData = {"": "Wrapper;_inner",
   get$length: function(_) {
-    return $.scoped(new $.ChannelData_length_anon(this));
+    return $.get$length$asx(this._inner);
   },
   $index: function(_, index) {
-    return $.scoped(new $.ChannelData_operator$index_anon(this, index));
+    return $.$index$asx(this._inner, index);
   },
   $indexSet: function(_, index, value) {
-    $.scoped(new $.ChannelData_operator$indexSet_anon(this, index, value));
-  }
-};
-
-$$.ChannelData_length_anon = {"": "Closure;this_0",
-  call$0: function() {
-    return $.get$length$asx(this.this_0.get$_inner());
-  }
-};
-
-$$.ChannelData_operator$index_anon = {"": "Closure;this_0,index_1",
-  call$0: function() {
-    return $.$index$asx(this.this_0.get$_inner(), this.index_1);
-  }
-};
-
-$$.ChannelData_operator$indexSet_anon = {"": "Closure;this_0,index_1,value_2",
-  call$0: function() {
-    $.$indexSet$ax(this.this_0.get$_inner(), this.index_1, this.value_2);
+    var t1 = this._inner;
+    if (typeof t1 !== "object" || t1 === null || (t1.constructor !== Array || !!t1.immutable$list) && !$.getInterceptor(t1).$isJavaScriptIndexingBehavior())
+      return this.$$indexSet$bailout(1, index, value, t1);
+    if (index !== (index | 0))
+      throw $.iae(index);
+    if (index < 0 || index >= t1.length)
+      throw $.ioore(index);
+    t1[index] = value;
+  },
+  $$indexSet$bailout: function(state0, index, value, t1) {
+    $.$indexSet$ax(t1, index, value);
   }
 };
 
 $$.AudioParam = {"": "Wrapper;_inner",
   get$value: function(_) {
-    return $.scoped(new $.AudioParam_value_anon0(this));
+    return $.get$value$x(this._inner);
   },
   set$value: function(_, value) {
-    return $.scoped(new $.AudioParam_value_anon(this, value));
+    $.set$value$x(this._inner, value);
+    return value;
   },
   setTargetAtTime$3: function(_, target, startTime, timeConstant) {
-    $.scoped(new $.AudioParam_setTargetAtTime_anon(this, target, startTime, timeConstant));
+    $.setTargetAtTime$3$x(this._inner, target, startTime, timeConstant);
   },
   linearRampToValueAtTime$2: function(_, value, endTime) {
-    $.scoped(new $.AudioParam_linearRampToValueAtTime_anon(this, value, endTime));
-  }
-};
-
-$$.AudioParam_value_anon0 = {"": "Closure;this_0",
-  call$0: function() {
-    return $.get$value$x(this.this_0.get$_inner());
-  }
-};
-
-$$.AudioParam_value_anon = {"": "Closure;this_0,value_1",
-  call$0: function() {
-    $.set$value$x(this.this_0.get$_inner(), this.value_1);
-  }
-};
-
-$$.AudioParam_setTargetAtTime_anon = {"": "Closure;this_0,target_1,startTime_2,timeConstant_3",
-  call$0: function() {
-    return $.setTargetAtTime$3$x(this.this_0.get$_inner(), this.target_1, this.startTime_2, this.timeConstant_3);
-  }
-};
-
-$$.AudioParam_linearRampToValueAtTime_anon = {"": "Closure;this_0,value_1,endTime_2",
-  call$0: function() {
-    return $.linearRampToValueAtTime$2$x(this.this_0.get$_inner(), this.value_1, this.endTime_2);
+    $.linearRampToValueAtTime$2$x(this._inner, value, endTime);
   }
 };
 
 $$.AudioNode = {"": "Wrapper;",
   connect$2: function(_, destination, output) {
-    $.scoped(new $.AudioNode_connect_anon(this, destination, output));
+    $.connect$2$x(this._inner, destination.get$_inner(), output);
   }
 };
 
-$$.AudioNode_connect_anon = {"": "Closure;this_0,destination_1,output_2",
-  call$0: function() {
-    $.connect$2$x(this.this_0.get$_inner(), this.destination_1.get$_inner(), this.output_2);
-  }
-};
-
-$$.AudioBufferSourceNode = {"": "AudioNode;playbackRate*,gain*,_inner",
+$$.AudioBufferSourceNode = {"": "AudioNode;playbackRate>,gain>,_inner",
   set$buffer: function(_, value) {
-    $.scoped(new $.AudioBufferSourceNode_buffer_anon(this, value));
+    $.set$buffer$x(this._inner, value.get$_inner());
   },
   set$loop: function(_, value) {
-    $.scoped(new $.AudioBufferSourceNode_loop_anon(this, value));
+    $.set$loop$x(this._inner, value);
   },
   start$1: function(_, when) {
-    $.scoped(new $.AudioBufferSourceNode_start_anon(this, when));
+    $.start$1$x(this._inner, when);
   },
   stop$1: function(_, when) {
-    $.scoped(new $.AudioBufferSourceNode_stop_anon(this, when));
+    $.stop$1$x(this._inner, when);
   },
   AudioBufferSourceNode$1: function(inner) {
-    $.scoped(new $.anon0(this));
+    this.playbackRate = $.AudioParam$($.get$playbackRate$x(this._inner));
+    this.gain = $.AudioParam$($.get$gain$x(this._inner));
   }
 };
 
-$$.anon0 = {"": "Closure;this_0",
-  call$0: function() {
-    var t1 = this.this_0;
-    $.set$playbackRate$x(t1, $.AudioParam$($.get$playbackRate$x(t1.get$_inner())));
-    $.set$gain$x(t1, $.AudioParam$($.get$gain$x(t1.get$_inner())));
-  }
-};
-
-$$.AudioBufferSourceNode_buffer_anon = {"": "Closure;this_0,value_1",
-  call$0: function() {
-    $.set$buffer$x(this.this_0.get$_inner(), this.value_1.get$_inner());
-  }
-};
-
-$$.AudioBufferSourceNode_loop_anon = {"": "Closure;this_0,value_1",
-  call$0: function() {
-    $.set$loop$x(this.this_0.get$_inner(), this.value_1);
-  }
-};
-
-$$.AudioBufferSourceNode_start_anon = {"": "Closure;this_0,when_1",
-  call$0: function() {
-    return $.start$1$x(this.this_0.get$_inner(), this.when_1);
-  }
-};
-
-$$.AudioBufferSourceNode_stop_anon = {"": "Closure;this_0,when_1",
-  call$0: function() {
-    return $.stop$1$x(this.this_0.get$_inner(), this.when_1);
-  }
-};
-
-$$.GainNode = {"": "AudioNode;gain*,_inner",
+$$.GainNode = {"": "AudioNode;gain>,_inner",
   GainNode$1: function(inner) {
-    $.scoped(new $.anon1(this));
-  }
-};
-
-$$.anon1 = {"": "Closure;this_0",
-  call$0: function() {
-    var t1 = this.this_0;
-    $.set$gain$x(t1, $.AudioParam$($.get$gain$x(t1.get$_inner())));
+    this.gain = $.AudioParam$($.get$gain$x(this._inner));
   }
 };
 
@@ -7303,6 +7250,9 @@ $$.DomMimeTypeArray = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -7380,6 +7330,9 @@ $$.DomPluginArray = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -7464,6 +7417,9 @@ $$.DomStringList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -7558,12 +7514,12 @@ $$.EmbedElement = {"": "Element;name},type}"};
 $$.EntityReference = {"": "Node;"};
 
 $$.Entry = {"": "Interceptor;",
-  _liblib4$_remove$2: function(receiver, successCallback, errorCallback) {
+  _remove$2: function(receiver, successCallback, errorCallback) {
     return receiver.remove($.convertDartClosureToJS(successCallback, 0),$.convertDartClosureToJS(errorCallback, 1));
   },
   remove$0: function(receiver) {
     var completer = $._CompleterImpl$(null);
-    this._liblib4$_remove$2(receiver, new $.Entry_remove_anon(completer), new $.Entry_remove_anon0(completer));
+    this._remove$2(receiver, new $.Entry_remove_anon(completer), new $.Entry_remove_anon0(completer));
     return completer.future;
   }
 };
@@ -7659,6 +7615,9 @@ $$.FileList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -7773,6 +7732,9 @@ $$.Float32Array = {"": "ArrayBufferView;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -7846,6 +7808,9 @@ $$.Float64Array = {"": "ArrayBufferView;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -7943,6 +7908,9 @@ $$.HtmlAllCollection = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -8016,6 +7984,9 @@ $$.HtmlCollection = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -8154,6 +8125,9 @@ $$.Int16Array = {"": "ArrayBufferView;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -8227,6 +8201,9 @@ $$.Int32Array = {"": "ArrayBufferView;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -8302,6 +8279,9 @@ $$.Int8Array = {"": "ArrayBufferView;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -8372,7 +8352,7 @@ $$.Location = {"": "Interceptor;",
 
 $$.MapElement = {"": "Element;name}"};
 
-$$.MediaController = {"": "EventTarget;currentTime=,playbackRate%",
+$$.MediaController = {"": "EventTarget;currentTime=,playbackRate=",
   $$dom_addEventListener$3: function(receiver, type, listener, useCapture) {
     return receiver.addEventListener(type,$.convertDartClosureToJS(listener, 1),useCapture);
   },
@@ -8381,7 +8361,7 @@ $$.MediaController = {"": "EventTarget;currentTime=,playbackRate%",
   }
 };
 
-$$.MediaElement = {"": "Element;currentTime=,error=,loop},playbackRate%"};
+$$.MediaElement = {"": "Element;currentTime=,error=,loop},playbackRate="};
 
 $$.MediaError = {"": "Interceptor;"};
 
@@ -8537,6 +8517,9 @@ $$.NodeList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -8754,6 +8737,9 @@ $$.SourceBufferList = {"": "EventTarget;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -8839,6 +8825,9 @@ $$.SpeechGrammarList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -8936,6 +8925,9 @@ $$.Storage = {"": "Interceptor;",
   get$length: function(receiver) {
     return receiver.length;
   },
+  get$isEmpty: function(receiver) {
+    return receiver.key(0) == null;
+  },
   $isMap: function() {
     return true;
   },
@@ -9024,6 +9016,9 @@ $$.TextTrackCueList = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -9097,6 +9092,9 @@ $$.TextTrackList = {"": "EventTarget;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -9194,6 +9192,9 @@ $$.TouchList = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -9280,6 +9281,9 @@ $$.Uint16Array = {"": "ArrayBufferView;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -9353,6 +9357,9 @@ $$.Uint32Array = {"": "ArrayBufferView;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -9428,6 +9435,9 @@ $$.Uint8Array = {"": "ArrayBufferView;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return this.$index(receiver, index);
   },
@@ -9498,6 +9508,9 @@ $$.Uint8ClampedArray = {"": "Uint8Array;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -9738,6 +9751,9 @@ $$._ClientRectList = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -9811,6 +9827,9 @@ $$._CssRuleList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -9886,6 +9905,9 @@ $$._CssValueList = {"": "CssValue;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -9959,6 +9981,9 @@ $$._EntryArray = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -10034,6 +10059,9 @@ $$._EntryArraySync = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -10107,6 +10135,9 @@ $$._GamepadList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -10196,6 +10227,9 @@ $$._NamedNodeMap = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -10269,6 +10303,9 @@ $$._SpeechInputResultList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -10344,6 +10381,9 @@ $$._SpeechRecognitionResultList = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver[index];
   },
@@ -10417,6 +10457,9 @@ $$._StyleSheetList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver[index];
@@ -10710,6 +10753,9 @@ $$.LengthList = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver.getItem(index);
   },
@@ -10797,6 +10843,9 @@ $$.NumberList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver.getItem(index);
@@ -10912,6 +10961,9 @@ $$.PathSegList = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver.getItem(index);
   },
@@ -11015,6 +11067,9 @@ $$.StringList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver.getItem(index);
@@ -11155,6 +11210,9 @@ $$.TransformList = {"": "Interceptor;",
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
   },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
+  },
   elementAt$1: function(receiver, index) {
     return receiver.getItem(index);
   },
@@ -11238,6 +11296,9 @@ $$._ElementInstanceList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return receiver.item(index);
@@ -11327,7 +11388,7 @@ $$._SVGVKernElement = {"": "SvgElement;"};
 
 $$.AnalyserNode = {"": "AudioNode0;"};
 
-$$.AudioBuffer0 = {"": "Interceptor;gain%,length=,sampleRate=",
+$$.AudioBuffer0 = {"": "Interceptor;gain=,length=,sampleRate=",
   getChannelData$1: function(receiver, channelIndex) {
     return receiver.getChannelData(channelIndex);
   }
@@ -11420,11 +11481,7 @@ $$.ConvolverNode = {"": "AudioNode0;buffer}"};
 
 $$.DelayNode = {"": "AudioNode0;"};
 
-$$.DynamicsCompressorNode = {"": "AudioNode0;",
-  release$0: function($receiver) {
-    return this.release.call$0();
-  }
-};
+$$.DynamicsCompressorNode = {"": "AudioNode0;"};
 
 $$.GainNode0 = {"": "AudioNode0;gain="};
 
@@ -11546,6 +11603,9 @@ $$.SqlResultSetRowList = {"": "Interceptor;",
   },
   toList$0: function($receiver) {
     return this.toList$1$growable($receiver, true);
+  },
+  get$isEmpty: function(receiver) {
+    return this.get$length(receiver) === 0;
   },
   elementAt$1: function(receiver, index) {
     return $.convertNativeToDart_Dictionary(receiver.item(index));
@@ -12594,10 +12654,6 @@ $.getRuntimeTypeString = function(object) {
   return className + "<" + $.joinArguments(typeInfo, 0) + ">";
 };
 
-$.createRuntimeType = function($name) {
-  return $.TypeImpl$($name);
-};
-
 $._convertJsonToDart = function(json, reviver) {
   var revive = reviver == null ? new $._convertJsonToDart_anon() : reviver;
   return revive.call$2("", new $._convertJsonToDart_walk(revive).call$1(json));
@@ -12818,7 +12874,7 @@ $.dynamicBindLookup = function(hasOwnPropertyFunction, tag, methods) {
       if (typeof($dynamicMetadata) === "undefined")
         $._dynamicMetadata([]);
       entry = $dynamicMetadata[i];
-      if (hasOwnPropertyFunction.call(entry.get$_liblib6$_set(), tag)) {
+      if (hasOwnPropertyFunction.call(entry.get$_liblib4$_set(), tag)) {
         t1 = entry.get$_tag();
         method = hasOwnPropertyFunction.call(methods, t1) ? methods[t1] : null;
         if (method != null)
@@ -12925,6 +12981,33 @@ $.AsyncError$ = function(error, stackTrace) {
 
 $.AsyncError$withCause = function(error, stackTrace, cause) {
   return new $.AsyncError(error, stackTrace, cause);
+};
+
+$._asyncRunCallback = function() {
+  var callbacks, i, callback, remainingCallbacks, newCallbacks, exception;
+  for (; $.get$isEmpty$asx($.get$_asyncCallbacks()) !== true;) {
+    callbacks = $.get$_asyncCallbacks();
+    $._asyncCallbacks = [];
+    for (i = 0; $.$lt$n(i, $.get$length$asx(callbacks)); i = $.$add$ns(i, 1)) {
+      callback = $.$index$asx(callbacks, i);
+      $.$indexSet$ax(callbacks, i, null);
+      try {
+        callback.call$0();
+      } catch (exception) {
+        $.unwrapException(exception);
+        i = $.$add$ns(i, 1);
+        remainingCallbacks = $.sublist$1$ax(callbacks, i);
+        newCallbacks = $.get$_asyncCallbacks();
+        $._asyncCallbacks = [];
+        $.addAll$1$ax($.get$_asyncCallbacks(), remainingCallbacks);
+        $.addAll$1$ax($.get$_asyncCallbacks(), newCallbacks);
+        $.Timer_run($._asyncRunCallback);
+        throw exception;
+      }
+
+    }
+  }
+  $._callbacksAreEnqueued = false;
 };
 
 $._CompleterImpl$ = function(T) {
@@ -13655,13 +13738,13 @@ $._initialize = function() {
     script = document.createElement("script");
     t1 = $.getInterceptor$x(script);
     t1.set$type(script, "text/javascript");
-    t1.set$innerHtml(script, "(function() {\n  // Proxy support for js.dart.\n\n  var globalContext = window;\n\n  // Table for local objects and functions that are proxied.\n  function ProxiedObjectTable() {\n    // Name for debugging.\n    this.name = 'js-ref';\n\n    // Table from IDs to JS objects.\n    this.map = {};\n\n    // Generator for new IDs.\n    this._nextId = 0;\n\n    // Counter for deleted proxies.\n    this._deletedCount = 0;\n\n    // Flag for one-time initialization.\n    this._initialized = false;\n\n    // Ports for managing communication to proxies.\n    this.port = new ReceivePortSync();\n    this.sendPort = this.port.toSendPort();\n\n    // Set of IDs that are global.\n    // These will not be freed on an exitScope().\n    this.globalIds = {};\n\n    // Stack of scoped handles.\n    this.handleStack = [];\n\n    // Stack of active scopes where each value is represented by the size of\n    // the handleStack at the beginning of the scope.  When an active scope\n    // is popped, the handleStack is restored to where it was when the\n    // scope was entered.\n    this.scopeIndices = [];\n  }\n\n  // Number of valid IDs.  This is the number of objects (global and local)\n  // kept alive by this table.\n  ProxiedObjectTable.prototype.count = function () {\n    return Object.keys(this.map).length;\n  }\n\n  // Number of total IDs ever allocated.\n  ProxiedObjectTable.prototype.total = function () {\n    return this.count() + this._deletedCount;\n  }\n\n  // Adds an object to the table and return an ID for serialization.\n  ProxiedObjectTable.prototype.add = function (obj) {\n    if (this.scopeIndices.length == 0) {\n      throw \"Cannot allocate a proxy outside of a scope.\";\n    }\n    // TODO(vsm): Cache refs for each obj?\n    var ref = this.name + '-' + this._nextId++;\n    this.handleStack.push(ref);\n    this.map[ref] = obj;\n    return ref;\n  }\n\n  ProxiedObjectTable.prototype._initializeOnce = function () {\n    if (!this._initialized) {\n      this._initialize();\n      this._initialized = true;\n    }\n  }\n\n  // Enters a new scope for this table.\n  ProxiedObjectTable.prototype.enterScope = function() {\n    this._initializeOnce();\n    this.scopeIndices.push(this.handleStack.length);\n  }\n\n  // Invalidates all non-global IDs in the current scope and\n  // exit the current scope.\n  ProxiedObjectTable.prototype.exitScope = function() {\n    var start = this.scopeIndices.pop();\n    for (var i = start; i < this.handleStack.length; ++i) {\n      var key = this.handleStack[i];\n      if (!this.globalIds.hasOwnProperty(key)) {\n        delete this.map[this.handleStack[i]];\n        this._deletedCount++;\n      }\n    }\n    this.handleStack = this.handleStack.splice(0, start);\n  }\n\n  // Makes this ID globally scope.  It must be explicitly invalidated.\n  ProxiedObjectTable.prototype.globalize = function(id) {\n    this.globalIds[id] = true;\n  }\n\n  // Invalidates this ID, potentially freeing its corresponding object.\n  ProxiedObjectTable.prototype.invalidate = function(id) {\n    var old = this.get(id);\n    delete this.globalIds[id];\n    delete this.map[id];\n    this._deletedCount++;\n    return old;\n  }\n\n  // Gets the object or function corresponding to this ID.\n  ProxiedObjectTable.prototype.get = function (id) {\n    if (!this.map.hasOwnProperty(id)) {\n      throw 'Proxy ' + id + ' has been invalidated.'\n    }\n    return this.map[id];\n  }\n\n  ProxiedObjectTable.prototype._initialize = function () {\n    // Configure this table's port to forward methods, getters, and setters\n    // from the remote proxy to the local object.\n    var table = this;\n\n    this.port.receive(function (message) {\n      // TODO(vsm): Support a mechanism to register a handler here.\n      try {\n        var receiver = table.get(message[0]);\n        var member = message[1];\n        var kind = message[2];\n        var args = message[3].map(deserialize);\n        if (kind == 'get') {\n          // Getter.\n          var field = member;\n          if (field in receiver && args.length == 0) {\n            return [ 'return', serialize(receiver[field]) ];\n          }\n        } else if (kind == 'set') {\n          // Setter.\n          var field = member;\n          if (args.length == 1) {\n            return [ 'return', serialize(receiver[field] = args[0]) ];\n          }\n        } else if (kind == 'apply') {\n          // Direct function invocation.\n          // TODO(vsm): Should we capture _this_ automatically?\n          return [ 'return', serialize(receiver.apply(null, args)) ];\n        } else if (member == '[]' && args.length == 1) {\n          // Index getter.\n          return [ 'return', serialize(receiver[args[0]]) ];\n        } else if (member == '[]=' && args.length == 2) {\n          // Index setter.\n          return [ 'return', serialize(receiver[args[0]] = args[1]) ];\n        } else {\n          var f = receiver[member];\n          if (f) {\n            var result = f.apply(receiver, args);\n            return [ 'return', serialize(result) ];\n          }\n        }\n        return [ 'none' ];\n      } catch (e) {\n        return [ 'throws', e.toString() ];\n      }\n    });\n  }\n\n  // Singleton for local proxied objects.\n  var proxiedObjectTable = new ProxiedObjectTable();\n\n  // DOM element serialization code.\n  var _localNextElementId = 0;\n  var _DART_ID = 'data-dart_id';\n  var _DART_TEMPORARY_ATTACHED = 'data-dart_temporary_attached';\n\n  function serializeElement(e) {\n    // TODO(vsm): Use an isolate-specific id.\n    var id;\n    if (e.hasAttribute(_DART_ID)) {\n      id = e.getAttribute(_DART_ID);\n    } else {\n      id = (_localNextElementId++).toString();\n      e.setAttribute(_DART_ID, id);\n    }\n    if (e !== document.documentElement) {\n      // Element must be attached to DOM to be retrieve in js part.\n      // Attach top unattached parent to avoid detaching parent of \"e\" when\n      // appending \"e\" directly to document. We keep count of elements\n      // temporarily attached to prevent detaching top unattached parent to\n      // early. This count is equals to the length of _DART_TEMPORARY_ATTACHED\n      // attribute. There could be other elements to serialize having the same\n      // top unattached parent.\n      var top = e;\n      while (true) {\n        if (top.hasAttribute(_DART_TEMPORARY_ATTACHED)) {\n          var oldValue = top.getAttribute(_DART_TEMPORARY_ATTACHED);\n          var newValue = oldValue + \"a\";\n          top.setAttribute(_DART_TEMPORARY_ATTACHED, newValue);\n          break;\n        }\n        if (top.parentNode == null) {\n          top.setAttribute(_DART_TEMPORARY_ATTACHED, \"a\");\n          document.documentElement.appendChild(top);\n          break;\n        }\n        if (top.parentNode === document.documentElement) {\n          // e was already attached to dom\n          break;\n        }\n        top = top.parentNode;\n      }\n    }\n    return id;\n  }\n\n  function deserializeElement(id) {\n    // TODO(vsm): Clear the attribute.\n    var list = document.querySelectorAll('[' + _DART_ID + '=\"' + id + '\"]');\n\n    if (list.length > 1) throw 'Non unique ID: ' + id;\n    if (list.length == 0) {\n      throw 'Element must be attached to the document: ' + id;\n    }\n    var e = list[0];\n    if (e !== document.documentElement) {\n      // detach temporary attached element\n      var top = e;\n      while (true) {\n        if (top.hasAttribute(_DART_TEMPORARY_ATTACHED)) {\n          var oldValue = top.getAttribute(_DART_TEMPORARY_ATTACHED);\n          var newValue = oldValue.substring(1);\n          top.setAttribute(_DART_TEMPORARY_ATTACHED, newValue);\n          // detach top only if no more elements have to be unserialized\n          if (top.getAttribute(_DART_TEMPORARY_ATTACHED).length === 0) {\n            top.removeAttribute(_DART_TEMPORARY_ATTACHED);\n            document.documentElement.removeChild(top);\n          }\n          break;\n        }\n        if (top.parentNode === document.documentElement) {\n          // e was already attached to dom\n          break;\n        }\n        top = top.parentNode;\n      }\n    }\n    return e;\n  }\n\n\n  // Type for remote proxies to Dart objects.\n  function DartProxy(id, sendPort) {\n    this.id = id;\n    this.port = sendPort;\n  }\n\n  // Serializes JS types to SendPortSync format:\n  // - primitives -> primitives\n  // - sendport -> sendport\n  // - DOM element -> [ 'domref', element-id ]\n  // - Function -> [ 'funcref', function-id, sendport ]\n  // - Object -> [ 'objref', object-id, sendport ]\n  function serialize(message) {\n    if (message == null) {\n      return null;  // Convert undefined to null.\n    } else if (typeof(message) == 'string' ||\n               typeof(message) == 'number' ||\n               typeof(message) == 'boolean') {\n      // Primitives are passed directly through.\n      return message;\n    } else if (message instanceof SendPortSync) {\n      // Non-proxied objects are serialized.\n      return message;\n    } else if (message instanceof Element &&\n        (message.ownerDocument == null || message.ownerDocument == document)) {\n      return [ 'domref', serializeElement(message) ];\n    } else if (typeof(message) == 'function') {\n      if ('_dart_id' in message) {\n        // Remote function proxy.\n        var remoteId = message._dart_id;\n        var remoteSendPort = message._dart_port;\n        return [ 'funcref', remoteId, remoteSendPort ];\n      } else {\n        // Local function proxy.\n        return [ 'funcref',\n                 proxiedObjectTable.add(message),\n                 proxiedObjectTable.sendPort ];\n      }\n    } else if (message instanceof DartProxy) {\n      // Remote object proxy.\n      return [ 'objref', message.id, message.port ];\n    } else {\n      // Local object proxy.\n      return [ 'objref',\n               proxiedObjectTable.add(message),\n               proxiedObjectTable.sendPort ];\n    }\n  }\n\n  function deserialize(message) {\n    if (message == null) {\n      return null;  // Convert undefined to null.\n    } else if (typeof(message) == 'string' ||\n               typeof(message) == 'number' ||\n               typeof(message) == 'boolean') {\n      // Primitives are passed directly through.\n      return message;\n    } else if (message instanceof SendPortSync) {\n      // Serialized type.\n      return message;\n    }\n    var tag = message[0];\n    switch (tag) {\n      case 'funcref': return deserializeFunction(message);\n      case 'objref': return deserializeObject(message);\n      case 'domref': return deserializeElement(message[1]);\n    }\n    throw 'Unsupported serialized data: ' + message;\n  }\n\n  // Create a local function that forwards to the remote function.\n  function deserializeFunction(message) {\n    var id = message[1];\n    var port = message[2];\n    // TODO(vsm): Add a more robust check for a local SendPortSync.\n    if (\"receivePort\" in port) {\n      // Local function.\n      return proxiedObjectTable.get(id);\n    } else {\n      // Remote function.  Forward to its port.\n      var f = function () {\n        var depth = enterScope();\n        try {\n          var args = Array.prototype.slice.apply(arguments).map(serialize);\n          var result = port.callSync([id, '#call', args]);\n          if (result[0] == 'throws') throw deserialize(result[1]);\n          return deserialize(result[1]);\n        } finally {\n          exitScope(depth);\n        }\n      };\n      // Cache the remote id and port.\n      f._dart_id = id;\n      f._dart_port = port;\n      return f;\n    }\n  }\n\n  // Creates a DartProxy to forwards to the remote object.\n  function deserializeObject(message) {\n    var id = message[1];\n    var port = message[2];\n    // TODO(vsm): Add a more robust check for a local SendPortSync.\n    if (\"receivePort\" in port) {\n      // Local object.\n      return proxiedObjectTable.get(id);\n    } else {\n      // Remote object.\n      return new DartProxy(id, port);\n    }\n  }\n\n  // Remote handler to construct a new JavaScript object given its\n  // serialized constructor and arguments.\n  function construct(args) {\n    args = args.map(deserialize);\n    var constructor = args[0];\n    args = Array.prototype.slice.call(args, 1);\n\n    // Until 10 args, the 'new' operator is used. With more arguments we use a\n    // generic way that may not work, particulary when the constructor does not\n    // have an \"apply\" method.\n    var ret = null;\n    if (args.length === 0) {\n      ret = new constructor();\n    } else if (args.length === 1) {\n      ret = new constructor(args[0]);\n    } else if (args.length === 2) {\n      ret = new constructor(args[0], args[1]);\n    } else if (args.length === 3) {\n      ret = new constructor(args[0], args[1], args[2]);\n    } else if (args.length === 4) {\n      ret = new constructor(args[0], args[1], args[2], args[3]);\n    } else if (args.length === 5) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4]);\n    } else if (args.length === 6) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5]);\n    } else if (args.length === 7) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5], args[6]);\n    } else if (args.length === 8) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5], args[6]);\n    } else if (args.length === 9) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5], args[6]);\n    } else if (args.length === 10) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5], args[6], args[7], args[8], args[9]);\n    } else {\n      // Dummy Type with correct constructor.\n      var Type = function(){};\n      Type.prototype = constructor.prototype;\n  \n      // Create a new instance\n      var instance = new Type();\n  \n      // Call the original constructor.\n      ret = constructor.apply(instance, args);\n      ret = Object(ret) === ret ? ret : instance;\n    }\n    return serialize(ret);\n  }\n\n  // Remote handler to return the top-level JavaScript context.\n  function context(data) {\n    return serialize(globalContext);\n  }\n\n  // Remote handler for debugging.\n  function debug() {\n    var live = proxiedObjectTable.count();\n    var total = proxiedObjectTable.total();\n    return 'JS objects Live : ' + live +\n           ' (out of ' + total + ' ever allocated).';\n  }\n\n  // Return true if two JavaScript proxies are equal (==).\n  function proxyEquals(args) {\n    return deserialize(args[0]) == deserialize(args[1]);\n  }\n\n  // Return true if a JavaScript proxy is instance of a given type (instanceof).\n  function proxyInstanceof(args) {\n    return deserialize(args[0]) instanceof deserialize(args[1]);\n  }\n\n  // Return true if a JavaScript proxy is instance of a given type (instanceof).\n  function proxyDeleteProperty(args) {\n    delete deserialize(args[0])[deserialize(args[1])];\n  }\n\n  function proxyConvert(args) {\n    return serialize(deserializeDataTree(args));\n  }\n\n  function deserializeDataTree(data) {\n    var type = data[0];\n    var value = data[1];\n    if (type === 'map') {\n      var obj = {};\n      for (var i = 0; i < value.length; i++) {\n        obj[value[i][0]] = deserializeDataTree(value[i][1]);\n      }\n      return obj;\n    } else if (type === 'list') {\n      var list = [];\n      for (var i = 0; i < value.length; i++) {\n        list.push(deserializeDataTree(value[i]));\n      }\n      return list;\n    } else /* 'simple' */ {\n      return deserialize(value);\n    }\n  }\n\n  function makeGlobalPort(name, f) {\n    var port = new ReceivePortSync();\n    port.receive(f);\n    window.registerPort(name, port.toSendPort());\n  }\n\n  // Enters a new scope in the JavaScript context.\n  function enterJavaScriptScope() {\n    proxiedObjectTable.enterScope();\n  }\n\n  // Enters a new scope in both the JavaScript and Dart context.\n  var _dartEnterScopePort = null;\n  function enterScope() {\n    enterJavaScriptScope();\n    if (!_dartEnterScopePort) {\n      _dartEnterScopePort = window.lookupPort('js-dart-enter-scope');\n    }\n    return _dartEnterScopePort.callSync([]);\n  }\n\n  // Exits the current scope (and invalidate local IDs) in the JavaScript\n  // context.\n  function exitJavaScriptScope() {\n    proxiedObjectTable.exitScope();\n  }\n\n  // Exits the current scope in both the JavaScript and Dart context.\n  var _dartExitScopePort = null;\n  function exitScope(depth) {\n    exitJavaScriptScope();\n    if (!_dartExitScopePort) {\n      _dartExitScopePort = window.lookupPort('js-dart-exit-scope');\n    }\n    return _dartExitScopePort.callSync([ depth ]);\n  }\n\n  makeGlobalPort('dart-js-context', context);\n  makeGlobalPort('dart-js-create', construct);\n  makeGlobalPort('dart-js-debug', debug);\n  makeGlobalPort('dart-js-equals', proxyEquals);\n  makeGlobalPort('dart-js-instanceof', proxyInstanceof);\n  makeGlobalPort('dart-js-delete-property', proxyDeleteProperty);\n  makeGlobalPort('dart-js-convert', proxyConvert);\n  makeGlobalPort('dart-js-enter-scope', enterJavaScriptScope);\n  makeGlobalPort('dart-js-exit-scope', exitJavaScriptScope);\n  makeGlobalPort('dart-js-globalize', function(data) {\n    if (data[0] == \"objref\") return proxiedObjectTable.globalize(data[1]);\n    // TODO(vsm): Do we ever need to globalize functions?\n    throw 'Illegal type: ' + data[0];\n  });\n  makeGlobalPort('dart-js-invalidate', function(data) {\n    if (data[0] == \"objref\") return proxiedObjectTable.invalidate(data[1]);\n    // TODO(vsm): Do we ever need to globalize functions?\n    throw 'Illegal type: ' + data[0];\n  });\n})();\n");
+    t1.set$innerHtml(script, "(function() {\n  // Proxy support for js.dart.\n\n  var globalContext = window;\n\n  // Support for binding the receiver (this) in proxied functions.\n  function bindIfFunction(f, _this) {\n    if (typeof(f) != \"function\") {\n      return f;\n    } else {\n      return new BoundFunction(_this, f);\n    }\n  }\n\n  function unbind(obj) {\n    if (obj instanceof BoundFunction) {\n      return obj.object;\n    } else {\n      return obj;\n    }\n  }\n\n  function getBoundThis(obj) {\n    if (obj instanceof BoundFunction) {\n      return obj._this;\n    } else {\n      return globalContext;\n    }\n  }\n\n  function BoundFunction(_this, object) {\n    this._this = _this;\n    this.object = object;\n  }\n\n  // Table for local objects and functions that are proxied.\n  function ProxiedObjectTable() {\n    // Name for debugging.\n    this.name = 'js-ref';\n\n    // Table from IDs to JS objects.\n    this.map = {};\n\n    // Generator for new IDs.\n    this._nextId = 0;\n\n    // Counter for deleted proxies.\n    this._deletedCount = 0;\n\n    // Flag for one-time initialization.\n    this._initialized = false;\n\n    // Ports for managing communication to proxies.\n    this.port = new ReceivePortSync();\n    this.sendPort = this.port.toSendPort();\n\n    // Set of IDs that are global.\n    // These will not be freed on an exitScope().\n    this.globalIds = {};\n\n    // Stack of scoped handles.\n    this.handleStack = [];\n\n    // Stack of active scopes where each value is represented by the size of\n    // the handleStack at the beginning of the scope.  When an active scope\n    // is popped, the handleStack is restored to where it was when the\n    // scope was entered.\n    this.scopeIndices = [];\n  }\n\n  // Number of valid IDs.  This is the number of objects (global and local)\n  // kept alive by this table.\n  ProxiedObjectTable.prototype.count = function () {\n    return Object.keys(this.map).length;\n  }\n\n  // Number of total IDs ever allocated.\n  ProxiedObjectTable.prototype.total = function () {\n    return this.count() + this._deletedCount;\n  }\n\n  // Adds an object to the table and return an ID for serialization.\n  ProxiedObjectTable.prototype.add = function (obj) {\n    if (this.scopeIndices.length == 0) {\n      throw \"Cannot allocate a proxy outside of a scope.\";\n    }\n    // TODO(vsm): Cache refs for each obj?\n    var ref = this.name + '-' + this._nextId++;\n    this.handleStack.push(ref);\n    this.map[ref] = obj;\n    return ref;\n  }\n\n  ProxiedObjectTable.prototype._initializeOnce = function () {\n    if (!this._initialized) {\n      this._initialize();\n      this._initialized = true;\n    }\n  }\n\n  // Enters a new scope for this table.\n  ProxiedObjectTable.prototype.enterScope = function() {\n    this._initializeOnce();\n    this.scopeIndices.push(this.handleStack.length);\n  }\n\n  // Invalidates all non-global IDs in the current scope and\n  // exit the current scope.\n  ProxiedObjectTable.prototype.exitScope = function() {\n    var start = this.scopeIndices.pop();\n    for (var i = start; i < this.handleStack.length; ++i) {\n      var key = this.handleStack[i];\n      if (!this.globalIds.hasOwnProperty(key)) {\n        delete this.map[this.handleStack[i]];\n        this._deletedCount++;\n      }\n    }\n    this.handleStack = this.handleStack.splice(0, start);\n  }\n\n  // Makes this ID globally scope.  It must be explicitly invalidated.\n  ProxiedObjectTable.prototype.globalize = function(id) {\n    this.globalIds[id] = true;\n  }\n\n  // Invalidates this ID, potentially freeing its corresponding object.\n  ProxiedObjectTable.prototype.invalidate = function(id) {\n    var old = this.get(id);\n    delete this.globalIds[id];\n    delete this.map[id];\n    this._deletedCount++;\n    return old;\n  }\n\n  // Gets the object or function corresponding to this ID.\n  ProxiedObjectTable.prototype.get = function (id) {\n    if (!this.map.hasOwnProperty(id)) {\n      throw 'Proxy ' + id + ' has been invalidated.'\n    }\n    return this.map[id];\n  }\n\n  ProxiedObjectTable.prototype._initialize = function () {\n    // Configure this table's port to forward methods, getters, and setters\n    // from the remote proxy to the local object.\n    var table = this;\n\n    this.port.receive(function (message) {\n      // TODO(vsm): Support a mechanism to register a handler here.\n      try {\n        var object = table.get(message[0]);\n        var receiver = unbind(object);\n        var member = message[1];\n        var kind = message[2];\n        var args = message[3].map(deserialize);\n        if (kind == 'get') {\n          // Getter.\n          var field = member;\n          if (field in receiver && args.length == 0) {\n            var result = bindIfFunction(receiver[field], receiver);\n            return [ 'return', serialize(result) ];\n          }\n        } else if (kind == 'set') {\n          // Setter.\n          var field = member;\n          if (args.length == 1) {\n            return [ 'return', serialize(receiver[field] = args[0]) ];\n          }\n        } else if (kind == 'apply') {\n          // Direct function invocation.\n          var _this = getBoundThis(object);\n          return [ 'return', serialize(receiver.apply(_this, args)) ];\n        } else if (member == '[]' && args.length == 1) {\n          // Index getter.\n          var result = bindIfFunction(receiver[args[0]], receiver);\n          return [ 'return', serialize(result) ];\n        } else if (member == '[]=' && args.length == 2) {\n          // Index setter.\n          return [ 'return', serialize(receiver[args[0]] = args[1]) ];\n        } else {\n          // Member function invocation.\n          var f = receiver[member];\n          if (f) {\n            var result = f.apply(receiver, args);\n            return [ 'return', serialize(result) ];\n          }\n        }\n        return [ 'none' ];\n      } catch (e) {\n        return [ 'throws', e.toString() ];\n      }\n    });\n  }\n\n  // Singleton for local proxied objects.\n  var proxiedObjectTable = new ProxiedObjectTable();\n\n  // DOM element serialization code.\n  var _localNextElementId = 0;\n  var _DART_ID = 'data-dart_id';\n  var _DART_TEMPORARY_ATTACHED = 'data-dart_temporary_attached';\n\n  function serializeElement(e) {\n    // TODO(vsm): Use an isolate-specific id.\n    var id;\n    if (e.hasAttribute(_DART_ID)) {\n      id = e.getAttribute(_DART_ID);\n    } else {\n      id = (_localNextElementId++).toString();\n      e.setAttribute(_DART_ID, id);\n    }\n    if (e !== document.documentElement) {\n      // Element must be attached to DOM to be retrieve in js part.\n      // Attach top unattached parent to avoid detaching parent of \"e\" when\n      // appending \"e\" directly to document. We keep count of elements\n      // temporarily attached to prevent detaching top unattached parent to\n      // early. This count is equals to the length of _DART_TEMPORARY_ATTACHED\n      // attribute. There could be other elements to serialize having the same\n      // top unattached parent.\n      var top = e;\n      while (true) {\n        if (top.hasAttribute(_DART_TEMPORARY_ATTACHED)) {\n          var oldValue = top.getAttribute(_DART_TEMPORARY_ATTACHED);\n          var newValue = oldValue + \"a\";\n          top.setAttribute(_DART_TEMPORARY_ATTACHED, newValue);\n          break;\n        }\n        if (top.parentNode == null) {\n          top.setAttribute(_DART_TEMPORARY_ATTACHED, \"a\");\n          document.documentElement.appendChild(top);\n          break;\n        }\n        if (top.parentNode === document.documentElement) {\n          // e was already attached to dom\n          break;\n        }\n        top = top.parentNode;\n      }\n    }\n    return id;\n  }\n\n  function deserializeElement(id) {\n    // TODO(vsm): Clear the attribute.\n    var list = document.querySelectorAll('[' + _DART_ID + '=\"' + id + '\"]');\n\n    if (list.length > 1) throw 'Non unique ID: ' + id;\n    if (list.length == 0) {\n      throw 'Element must be attached to the document: ' + id;\n    }\n    var e = list[0];\n    if (e !== document.documentElement) {\n      // detach temporary attached element\n      var top = e;\n      while (true) {\n        if (top.hasAttribute(_DART_TEMPORARY_ATTACHED)) {\n          var oldValue = top.getAttribute(_DART_TEMPORARY_ATTACHED);\n          var newValue = oldValue.substring(1);\n          top.setAttribute(_DART_TEMPORARY_ATTACHED, newValue);\n          // detach top only if no more elements have to be unserialized\n          if (top.getAttribute(_DART_TEMPORARY_ATTACHED).length === 0) {\n            top.removeAttribute(_DART_TEMPORARY_ATTACHED);\n            document.documentElement.removeChild(top);\n          }\n          break;\n        }\n        if (top.parentNode === document.documentElement) {\n          // e was already attached to dom\n          break;\n        }\n        top = top.parentNode;\n      }\n    }\n    return e;\n  }\n\n\n  // Type for remote proxies to Dart objects.\n  function DartProxy(id, sendPort) {\n    this.id = id;\n    this.port = sendPort;\n  }\n\n  // Serializes JS types to SendPortSync format:\n  // - primitives -> primitives\n  // - sendport -> sendport\n  // - DOM element -> [ 'domref', element-id ]\n  // - Function -> [ 'funcref', function-id, sendport ]\n  // - Object -> [ 'objref', object-id, sendport ]\n  function serialize(message) {\n    if (message == null) {\n      return null;  // Convert undefined to null.\n    } else if (typeof(message) == 'string' ||\n               typeof(message) == 'number' ||\n               typeof(message) == 'boolean') {\n      // Primitives are passed directly through.\n      return message;\n    } else if (message instanceof SendPortSync) {\n      // Non-proxied objects are serialized.\n      return message;\n    } else if (message instanceof Element &&\n        (message.ownerDocument == null || message.ownerDocument == document)) {\n      return [ 'domref', serializeElement(message) ];\n    } else if (message instanceof BoundFunction &&\n               typeof(message.object) == 'function') {\n      // Local function proxy.\n      return [ 'funcref',\n               proxiedObjectTable.add(message),\n               proxiedObjectTable.sendPort ];\n    } else if (typeof(message) == 'function') {\n      if ('_dart_id' in message) {\n        // Remote function proxy.\n        var remoteId = message._dart_id;\n        var remoteSendPort = message._dart_port;\n        return [ 'funcref', remoteId, remoteSendPort ];\n      } else {\n        // Local function proxy.\n        return [ 'funcref',\n                 proxiedObjectTable.add(message),\n                 proxiedObjectTable.sendPort ];\n      }\n    } else if (message instanceof DartProxy) {\n      // Remote object proxy.\n      return [ 'objref', message.id, message.port ];\n    } else {\n      // Local object proxy.\n      return [ 'objref',\n               proxiedObjectTable.add(message),\n               proxiedObjectTable.sendPort ];\n    }\n  }\n\n  function deserialize(message) {\n    if (message == null) {\n      return null;  // Convert undefined to null.\n    } else if (typeof(message) == 'string' ||\n               typeof(message) == 'number' ||\n               typeof(message) == 'boolean') {\n      // Primitives are passed directly through.\n      return message;\n    } else if (message instanceof SendPortSync) {\n      // Serialized type.\n      return message;\n    }\n    var tag = message[0];\n    switch (tag) {\n      case 'funcref': return deserializeFunction(message);\n      case 'objref': return deserializeObject(message);\n      case 'domref': return deserializeElement(message[1]);\n    }\n    throw 'Unsupported serialized data: ' + message;\n  }\n\n  // Create a local function that forwards to the remote function.\n  function deserializeFunction(message) {\n    var id = message[1];\n    var port = message[2];\n    // TODO(vsm): Add a more robust check for a local SendPortSync.\n    if (\"receivePort\" in port) {\n      // Local function.\n      return proxiedObjectTable.get(id);\n    } else {\n      // Remote function.  Forward to its port.\n      var f = function () {\n        var depth = enterScope();\n        try {\n          var args = Array.prototype.slice.apply(arguments).map(serialize);\n          var result = port.callSync([id, '#call', args]);\n          if (result[0] == 'throws') throw deserialize(result[1]);\n          return deserialize(result[1]);\n        } finally {\n          exitScope(depth);\n        }\n      };\n      // Cache the remote id and port.\n      f._dart_id = id;\n      f._dart_port = port;\n      return f;\n    }\n  }\n\n  // Creates a DartProxy to forwards to the remote object.\n  function deserializeObject(message) {\n    var id = message[1];\n    var port = message[2];\n    // TODO(vsm): Add a more robust check for a local SendPortSync.\n    if (\"receivePort\" in port) {\n      // Local object.\n      return proxiedObjectTable.get(id);\n    } else {\n      // Remote object.\n      return new DartProxy(id, port);\n    }\n  }\n\n  // Remote handler to construct a new JavaScript object given its\n  // serialized constructor and arguments.\n  function construct(args) {\n    args = args.map(deserialize);\n    var constructor = unbind(args[0]);\n    args = Array.prototype.slice.call(args, 1);\n\n    // Until 10 args, the 'new' operator is used. With more arguments we use a\n    // generic way that may not work, particulary when the constructor does not\n    // have an \"apply\" method.\n    var ret = null;\n    if (args.length === 0) {\n      ret = new constructor();\n    } else if (args.length === 1) {\n      ret = new constructor(args[0]);\n    } else if (args.length === 2) {\n      ret = new constructor(args[0], args[1]);\n    } else if (args.length === 3) {\n      ret = new constructor(args[0], args[1], args[2]);\n    } else if (args.length === 4) {\n      ret = new constructor(args[0], args[1], args[2], args[3]);\n    } else if (args.length === 5) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4]);\n    } else if (args.length === 6) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5]);\n    } else if (args.length === 7) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5], args[6]);\n    } else if (args.length === 8) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5], args[6]);\n    } else if (args.length === 9) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5], args[6]);\n    } else if (args.length === 10) {\n      ret = new constructor(args[0], args[1], args[2], args[3], args[4],\n                            args[5], args[6], args[7], args[8], args[9]);\n    } else {\n      // Dummy Type with correct constructor.\n      var Type = function(){};\n      Type.prototype = constructor.prototype;\n  \n      // Create a new instance\n      var instance = new Type();\n  \n      // Call the original constructor.\n      ret = constructor.apply(instance, args);\n      ret = Object(ret) === ret ? ret : instance;\n    }\n    return serialize(ret);\n  }\n\n  // Remote handler to return the top-level JavaScript context.\n  function context(data) {\n    return serialize(globalContext);\n  }\n\n  // Remote handler to track number of live / allocated proxies.\n  function proxyCount() {\n    var live = proxiedObjectTable.count();\n    var total = proxiedObjectTable.total();\n    return [live, total];\n  }\n\n  // Return true if two JavaScript proxies are equal (==).\n  function proxyEquals(args) {\n    return deserialize(args[0]) == deserialize(args[1]);\n  }\n\n  // Return true if a JavaScript proxy is instance of a given type (instanceof).\n  function proxyInstanceof(args) {\n    var obj = unbind(deserialize(args[0]));\n    var type = unbind(deserialize(args[1]));\n    return obj instanceof type;\n  }\n\n  // Return true if a JavaScript proxy is instance of a given type (instanceof).\n  function proxyDeleteProperty(args) {\n    var obj = unbind(deserialize(args[0]));\n    var member = unbind(deserialize(args[1]));\n    delete obj[member];\n  }\n\n  function proxyConvert(args) {\n    return serialize(deserializeDataTree(args));\n  }\n\n  function deserializeDataTree(data) {\n    var type = data[0];\n    var value = data[1];\n    if (type === 'map') {\n      var obj = {};\n      for (var i = 0; i < value.length; i++) {\n        obj[value[i][0]] = deserializeDataTree(value[i][1]);\n      }\n      return obj;\n    } else if (type === 'list') {\n      var list = [];\n      for (var i = 0; i < value.length; i++) {\n        list.push(deserializeDataTree(value[i]));\n      }\n      return list;\n    } else /* 'simple' */ {\n      return deserialize(value);\n    }\n  }\n\n  function makeGlobalPort(name, f) {\n    var port = new ReceivePortSync();\n    port.receive(f);\n    window.registerPort(name, port.toSendPort());\n  }\n\n  // Enters a new scope in the JavaScript context.\n  function enterJavaScriptScope() {\n    proxiedObjectTable.enterScope();\n  }\n\n  // Enters a new scope in both the JavaScript and Dart context.\n  var _dartEnterScopePort = null;\n  function enterScope() {\n    enterJavaScriptScope();\n    if (!_dartEnterScopePort) {\n      _dartEnterScopePort = window.lookupPort('js-dart-enter-scope');\n    }\n    return _dartEnterScopePort.callSync([]);\n  }\n\n  // Exits the current scope (and invalidate local IDs) in the JavaScript\n  // context.\n  function exitJavaScriptScope() {\n    proxiedObjectTable.exitScope();\n  }\n\n  // Exits the current scope in both the JavaScript and Dart context.\n  var _dartExitScopePort = null;\n  function exitScope(depth) {\n    exitJavaScriptScope();\n    if (!_dartExitScopePort) {\n      _dartExitScopePort = window.lookupPort('js-dart-exit-scope');\n    }\n    return _dartExitScopePort.callSync([ depth ]);\n  }\n\n  makeGlobalPort('dart-js-context', context);\n  makeGlobalPort('dart-js-create', construct);\n  makeGlobalPort('dart-js-proxy-count', proxyCount);\n  makeGlobalPort('dart-js-equals', proxyEquals);\n  makeGlobalPort('dart-js-instanceof', proxyInstanceof);\n  makeGlobalPort('dart-js-delete-property', proxyDeleteProperty);\n  makeGlobalPort('dart-js-convert', proxyConvert);\n  makeGlobalPort('dart-js-enter-scope', enterJavaScriptScope);\n  makeGlobalPort('dart-js-exit-scope', exitJavaScriptScope);\n  makeGlobalPort('dart-js-globalize', function(data) {\n    if (data[0] == \"objref\") return proxiedObjectTable.globalize(data[1]);\n    // TODO(vsm): Do we ever need to globalize functions?\n    throw 'Illegal type: ' + data[0];\n  });\n  makeGlobalPort('dart-js-invalidate', function(data) {\n    if (data[0] == \"objref\") return proxiedObjectTable.invalidate(data[1]);\n    // TODO(vsm): Do we ever need to globalize functions?\n    throw 'Illegal type: ' + data[0];\n  });\n})();\n");
     t1 = $.get$nodes$x($.get$body$x(document));
     t1.add$1(t1, script);
     $._jsPortSync = $.lookupPort$1$x(window, "dart-js-context");
   }
   $._jsPortCreate = $.lookupPort$1$x(window, "dart-js-create");
-  $._jsPortDebug = $.lookupPort$1$x(window, "dart-js-debug");
+  $._jsPortProxyCount = $.lookupPort$1$x(window, "dart-js-proxy-count");
   $._jsPortEquals = $.lookupPort$1$x(window, "dart-js-equals");
   $._jsPortInstanceof = $.lookupPort$1$x(window, "dart-js-instanceof");
   $._jsPortDeleteProperty = $.lookupPort$1$x(window, "dart-js-delete-property");
@@ -13681,27 +13764,21 @@ $._initialize = function() {
 };
 
 $.context0 = function() {
-  if ($.$eq($._depth(), 0) === true)
-    throw $.$$throw("Cannot get JavaScript context out of scope.");
+  $._enterScopeIfNeeded();
   return $._deserialize($._jsPortSync.callSync$1([]));
 };
 
-$._depth = function() {
-  return $.get$_proxiedObjectTable().get$_scopeIndices().length;
-};
-
-$.scoped = function(f) {
-  var depth, t1;
-  $._initialize();
-  $.get$_proxiedObjectTable().enterScope$0();
-  $._jsEnterJavaScriptScope.callSync$1([]);
-  depth = $.get$_proxiedObjectTable().get$_scopeIndices().length;
-  try {
-    t1 = f.call$0();
-    return t1;
-  } finally {
-    $._jsExitJavaScriptScope.callSync$1([]);
-    $.get$_proxiedObjectTable().exitScope$0();
+$._enterScopeIfNeeded = function() {
+  if ($.get$_proxiedObjectTable().get$_scopeIndices().length === 0) {
+    $._initialize();
+    $.get$_proxiedObjectTable().enterScope$0();
+    $._jsEnterJavaScriptScope.callSync$1([]);
+    var t1 = new $._enterScopeIfNeeded_anon($.get$_proxiedObjectTable().get$_scopeIndices().length);
+    $.add$1$ax($.get$_asyncCallbacks(), t1);
+    if ($._callbacksAreEnqueued !== true) {
+      $.Timer_run($._asyncRunCallback);
+      $._callbacksAreEnqueued = true;
+    }
   }
 };
 
@@ -13710,16 +13787,24 @@ $.retain = function(object) {
   return object;
 };
 
+$._pruneUndefined = function(arg1, arg2, arg3, arg4, arg5, arg6) {
+  var args, index;
+  args = [arg1, arg2, arg3, arg4, arg5, arg6];
+  index = $.JSArray_methods.indexOf$1(args, $.C__Undefined);
+  if ($.$lt$n(index, 0))
+    return args;
+  return $.JSArray_methods.sublist$2(args, 0, index);
+};
+
 $.Proxy$_internal = function(_port, _id) {
   return new $.Proxy(_port, _id);
 };
 
 $.Proxy__forward = function(receiver, member, kind, args) {
   var t1, result;
-  if ($.get$_proxiedObjectTable().get$_scopeIndices().length === 0)
-    throw $.$$throw("Cannot access a JavaScript proxy out of scope.");
+  $._enterScopeIfNeeded();
   t1 = $.map$1$ax(args, $._serialize);
-  result = receiver._port.callSync$1([receiver._liblib$_id, member, kind, t1.toList$0(t1)]);
+  result = receiver._liblib2$_port.callSync$1([receiver._liblib2$_id, member, kind, t1.toList$0(t1)]);
   t1 = $.getInterceptor$asx(result);
   switch (t1.$index(result, 0)) {
     case "return":
@@ -13767,7 +13852,7 @@ $._serialize = function(message) {
     if (t1)
       return ["domref", $._serializeElement(message)];
     else if (typeof message === "object" && message !== null && !!$.getInterceptor(message).$isProxy)
-      return ["objref", message._liblib$_id, message._port];
+      return ["objref", message._liblib2$_id, message._liblib2$_port];
     else if (typeof message === "object" && message !== null && !!$.getInterceptor(message).$isSerializable)
       return $._serialize(message.toJs$0());
     else
@@ -13818,7 +13903,7 @@ $._serializeElement = function(e) {
       t2 = t1.get$attributes($top);
       if (t2.containsKey$1(t2, "data-dart_temporary_attached") === true) {
         t2 = t1.get$attributes($top);
-        newValue = $.concat$1$s(t2.$index(t2, "data-dart_temporary_attached"), "a");
+        newValue = $.$add$ns(t2.$index(t2, "data-dart_temporary_attached"), "a");
         t1 = t1.get$attributes($top);
         t1.$indexSet(t1, "data-dart_temporary_attached", newValue);
         break;
@@ -13876,7 +13961,7 @@ $._deserializeElement = function(id) {
 
 $.AudioContext$ = function() {
   var t1, t2;
-  t1 = $.scoped(new $.anon2());
+  t1 = $.context0().createAudioContext$0();
   t2 = new $.AudioContext(null, null);
   t2.Wrapper$1(t1);
   t2.AudioContext$0();
@@ -13947,6 +14032,8 @@ $.dynamicBind.call$4 = $.dynamicBind;
 $.dynamicBind.$name = "dynamicBind";
 $._redispatchGetNativeInterceptorHook.call$2 = $._redispatchGetNativeInterceptorHook;
 $._redispatchGetNativeInterceptorHook.$name = "_redispatchGetNativeInterceptorHook";
+$._asyncRunCallback.call$0 = $._asyncRunCallback;
+$._asyncRunCallback.$name = "_asyncRunCallback";
 $._nullDataHandler.call$1 = $._nullDataHandler;
 $._nullDataHandler.$name = "_nullDataHandler";
 $._nullErrorHandler.call$1 = $._nullErrorHandler;
@@ -13960,6 +14047,7 @@ $._deserialize.$name = "_deserialize";
 $.num = {builtin$cls: "num"};
 $._ManagerStub = {builtin$cls: "_ManagerStub"};
 $.String = {builtin$cls: "String"};
+$.bool = {builtin$cls: "bool"};
 $.ReceivePort = {builtin$cls: "ReceivePort"};
 $.$double = {builtin$cls: "$double"};
 $.$int = {builtin$cls: "$int"};
@@ -13972,32 +14060,28 @@ Isolate.makeConstantList = function(list) {
   return list;
 };
 $.List_empty = Isolate.makeConstantList([]);
-$.EventStreamProvider_change = new $.EventStreamProvider("change");
-$.EventStreamProvider_success = new $.EventStreamProvider("success");
-$.EventStreamProvider_mouseup = new $.EventStreamProvider("mouseup");
-$.C__DeadEntry = new $._DeadEntry();
-$.EventStreamProvider_mouseout = new $.EventStreamProvider("mouseout");
-$.C_Object = new $.Object();
-$.C__LinkedHashTableHeadMarker = new $._LinkedHashTableHeadMarker();
-$.Type_$int = $.createRuntimeType('$int');
-$.JSDouble_methods = $.JSDouble.prototype;
-$.EventStreamProvider_mouseover = new $.EventStreamProvider("mouseover");
-$.C_Interceptor = new $.Interceptor();
-$.Duration_0 = new $.Duration(0);
 $.C_NullThrownError = new $.NullThrownError();
 $.JSInt_methods = $.JSInt.prototype;
+$.EventStreamProvider_success = new $.EventStreamProvider("success");
 $.JSArray_methods = $.JSArray.prototype;
-$.Type_String = $.createRuntimeType('String');
+$.C__Undefined = new $._Undefined();
+$.EventStreamProvider_change = new $.EventStreamProvider("change");
+$.EventStreamProvider_error = new $.EventStreamProvider("error");
 $.EventStreamProvider_click = new $.EventStreamProvider("click");
-$.Type_$double = $.createRuntimeType('$double');
+$.C__LinkedHashTableHeadMarker = new $._LinkedHashTableHeadMarker();
 $.EventStreamProvider_mousedown = new $.EventStreamProvider("mousedown");
+$.JSDouble_methods = $.JSDouble.prototype;
+$.EventStreamProvider_mouseout = new $.EventStreamProvider("mouseout");
+$.EventStreamProvider_mouseover = new $.EventStreamProvider("mouseover");
+$.C_Object = new $.Object();
+$.EventStreamProvider_mouseup = new $.EventStreamProvider("mouseup");
 $.JSNull_methods = $.JSNull.prototype;
-$.Type_Null = $.createRuntimeType('Null');
 $.JSNumber_methods = $.JSNumber.prototype;
 $.JSString_methods = $.JSString.prototype;
-$.Type_bool = $.createRuntimeType('bool');
+$.C_Interceptor = new $.Interceptor();
+$.Duration_0 = new $.Duration(0);
 $.C_CloseToken = new $.CloseToken();
-$.EventStreamProvider_error = new $.EventStreamProvider("error");
+$.C__DeadEntry = new $._DeadEntry();
 $.TAU = 6.283185307179586;
 $.SAMPLES_PER_CYCLE = 4096;
 $.mouseOn = false;
@@ -14008,12 +14092,13 @@ $.ReceivePortImpl__nextFreeId = 1;
 $.Primitives_hashCodeSeed = 0;
 $._getTypeNameOf = null;
 $.dynamicFunctionTable = null;
+$._callbacksAreEnqueued = false;
 $.ReceivePortSync__portMap = null;
 $.ReceivePortSync__portIdCount = null;
 $.ReceivePortSync__cachedIsolateId = null;
 $._jsPortSync = null;
 $._jsPortCreate = null;
-$._jsPortDebug = null;
+$._jsPortProxyCount = null;
 $._jsPortEquals = null;
 $._jsPortInstanceof = null;
 $._jsPortDeleteProperty = null;
@@ -14110,9 +14195,6 @@ $.add$1$ax = function(receiver, a0) {
 $.addAll$1$ax = function(receiver, a0) {
   return $.getInterceptor$ax(receiver).addAll$1(receiver, a0);
 };
-$.concat$1$s = function(receiver, a0) {
-  return $.getInterceptor$s(receiver).concat$1(receiver, a0);
-};
 $.connect$2$x = function(receiver, a0, a1) {
   return $.getInterceptor$x(receiver).connect$2(receiver, a0, a1);
 };
@@ -14176,6 +14258,9 @@ $.get$hashCode$ = function(receiver) {
 $.get$id$x = function(receiver) {
   return $.getInterceptor$x(receiver).get$id(receiver);
 };
+$.get$isEmpty$asx = function(receiver) {
+  return $.getInterceptor$asx(receiver).get$isEmpty(receiver);
+};
 $.get$iterator$ax = function(receiver) {
   return $.getInterceptor$ax(receiver).get$iterator(receiver);
 };
@@ -14202,9 +14287,6 @@ $.get$playbackRate$x = function(receiver) {
 };
 $.get$result$x = function(receiver) {
   return $.getInterceptor$x(receiver).get$result(receiver);
-};
-$.get$runtimeType$ = function(receiver) {
-  return $.getInterceptor(receiver).get$runtimeType(receiver);
 };
 $.get$sampleRate$x = function(receiver) {
   return $.getInterceptor$x(receiver).get$sampleRate(receiver);
@@ -14248,9 +14330,6 @@ $.queryAll$1$x = function(receiver, a0) {
 $.registerPort$2$x = function(receiver, a0, a1) {
   return $.getInterceptor$x(receiver).registerPort$2(receiver, a0, a1);
 };
-$.release$0$x = function(receiver) {
-  return $.getInterceptor$x(receiver).release$0(receiver);
-};
 $.remove$0$ax = function(receiver) {
   return $.getInterceptor$ax(receiver).remove$0(receiver);
 };
@@ -14266,17 +14345,8 @@ $.send$2$x = function(receiver, a0, a1) {
 $.set$buffer$x = function(receiver, value) {
   return $.getInterceptor$x(receiver).set$buffer(receiver, value);
 };
-$.set$destination$x = function(receiver, value) {
-  return $.getInterceptor$x(receiver).set$destination(receiver, value);
-};
-$.set$gain$x = function(receiver, value) {
-  return $.getInterceptor$x(receiver).set$gain(receiver, value);
-};
 $.set$loop$x = function(receiver, value) {
   return $.getInterceptor$x(receiver).set$loop(receiver, value);
-};
-$.set$playbackRate$x = function(receiver, value) {
-  return $.getInterceptor$x(receiver).set$playbackRate(receiver, value);
 };
 $.set$value$x = function(receiver, value) {
   return $.getInterceptor$x(receiver).set$value(receiver, value);
@@ -14414,6 +14484,9 @@ Isolate.$lazy($, "globalPostMessageDefined", "globalPostMessageDefined", "get$gl
 });
 Isolate.$lazy($, "thisScript", "IsolateNatives_thisScript", "get$IsolateNatives_thisScript", function() {
   return $.IsolateNatives_computeThisScript();
+});
+Isolate.$lazy($, "_asyncCallbacks", "_asyncCallbacks", "get$_asyncCallbacks", function() {
+  return [];
 });
 Isolate.$lazy($, "_runCallbacks", "Timer__runCallbacks", "get$Timer__runCallbacks", function() {
   return [];
@@ -15715,7 +15788,7 @@ function init() {
         }
       }
     }
-    var objectClassObject = collectedClasses.Object, shortNames = "call$0,call$1,call$2,call$3,call$4,eval$1,get$sb,then$1,toJs$0,get$_id,get$_tag,lookup$1,toJson$0,get$cause,process$0,_writeOn$1,callSync$1,get$_inner,get$_state,moveNext$0,register$2,set$_state,_callback$1,_dispatch$1,_sendData$1,exitScope$0,get$current,set$_handle,_sendError$1,_sendValue$1,catchError$1,enterScope$0,get$isWorker,get$sendPort,toSendPort$0,unregister$1,_setGlobals$0,get$_duration,get$_registry,get$_workerId,get$_hashTable,get$_isolateId,get$stackTrace,runIteration$0,throwDelayed$0,_checkReplyTo$1,get$_futurePort,get$releaseTime,get$_receivePort,get$topEventLoop,get$_liblib6$_set,get$_nextListener,get$_scopeIndices,get$nextIsolateId,get$selectedPatch,set$_nextListener,set$nextIsolateId,set$selectedPatch,get$currentContext,_liblib2$_callback$2,createAudioContext$0,get$_hasUnhandledError,get$_liblib2$_callback,get$_resultOrListeners,get$selectedSoundButton,set$selectedSoundButton".split(","), longNames = "call,call,call,call,call,eval,sb,then,toJs,_id,_tag,lookup,toJson,cause,process,_writeOn,callSync,_inner,_state,moveNext,register,_state=,_callback,_dispatch,_sendData,exitScope,current,_handle=,_sendError,_sendValue,catchError,enterScope,isWorker,sendPort,toSendPort,unregister,_setGlobals,_duration,_registry,_workerId,_hashTable,_isolateId,stackTrace,runIteration,throwDelayed,_checkReplyTo,_futurePort,releaseTime,_receivePort,topEventLoop,_set,_nextListener,_scopeIndices,nextIsolateId,selectedPatch,_nextListener=,nextIsolateId=,selectedPatch=,currentContext,_callback,createAudioContext,_hasUnhandledError,_callback,_resultOrListeners,selectedSoundButton,selectedSoundButton=".split(",");
+    var objectClassObject = collectedClasses.Object, shortNames = "call$0,call$1,call$2,call$3,call$4,eval$1,get$sb,then$1,toJs$0,get$_id,get$_tag,lookup$1,toJson$0,get$cause,process$0,_writeOn$1,callSync$1,get$_inner,get$_state,moveNext$0,register$2,set$_state,_callback$2,_dispatch$1,_sendData$1,exitScope$0,get$current,set$_handle,_sendError$1,_sendValue$1,catchError$1,enterScope$0,get$isWorker,get$sendPort,toSendPort$0,unregister$1,_setGlobals$0,get$_callback,get$_duration,get$_registry,get$_workerId,get$_hashTable,get$_isolateId,get$stackTrace,runIteration$0,throwDelayed$0,_checkReplyTo$1,get$_futurePort,get$releaseTime,get$_receivePort,get$topEventLoop,get$_liblib4$_set,get$_nextListener,get$_scopeIndices,get$nextIsolateId,get$selectedPatch,set$_nextListener,set$nextIsolateId,set$selectedPatch,get$currentContext,_liblib$_callback$1,createAudioContext$0,get$_hasUnhandledError,get$_resultOrListeners,get$selectedSoundButton,set$selectedSoundButton".split(","), longNames = "call,call,call,call,call,eval,sb,then,toJs,_id,_tag,lookup,toJson,cause,process,_writeOn,callSync,_inner,_state,moveNext,register,_state=,_callback,_dispatch,_sendData,exitScope,current,_handle=,_sendError,_sendValue,catchError,enterScope,isWorker,sendPort,toSendPort,unregister,_setGlobals,_callback,_duration,_registry,_workerId,_hashTable,_isolateId,stackTrace,runIteration,throwDelayed,_checkReplyTo,_futurePort,releaseTime,_receivePort,topEventLoop,_set,_nextListener,_scopeIndices,nextIsolateId,selectedPatch,_nextListener=,nextIsolateId=,selectedPatch=,currentContext,_callback,createAudioContext,_hasUnhandledError,_resultOrListeners,selectedSoundButton,selectedSoundButton=".split(",");
     for (var j = 0; j < shortNames.length; j++) {
       var type = 0;
       var short = shortNames[j];
