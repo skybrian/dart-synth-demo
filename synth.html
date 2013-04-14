@@ -9,7 +9,7 @@
   <body>
     <div class="container-fluid">
     
-      <h1>Synth</h1>
+      <h1>Synth Demo</h1>
     
       <div id="status"></div>
     
@@ -31,6 +31,10 @@
       </div>
     </div>
     
+    <div id="footer">
+      <a href="https://github.com/skybrian/dart-synth-demo">Source code</a>
+    </div>
+    
     <script>
       function createAudioContext() {
         return new webkitAudioContext();
@@ -39,7 +43,7 @@
         return obj.toString();
       }
     </script>
-    <script type="application/dart" src="synth.dart"></script>
     <script src="packages/browser/dart.js"></script>
+    <script src="synth.dart.js"></script>
   </body>
 </html>
