@@ -16,8 +16,7 @@ class Wrapper {
     if (_inner == null) {
       return "${this.runtimeType}(null)";
     }
-    // workaround for https://code.google.com/p/dart/issues/detail?id=9879
-    String val = js.context.getString(_inner);
+    String val = _inner["toString"]();
     return "${this.runtimeType}($val)";   
   }
 }
@@ -25,7 +24,7 @@ class Wrapper {
 class AudioContext extends Wrapper {
   AudioDestinationNode destination;
   
-  AudioContext() : super(js.context.createAudioContext()) {
+  AudioContext() : super(new js.Proxy(js.context.webkitAudioContext)) {
     destination = new AudioDestinationNode(_inner.destination);
   }
   

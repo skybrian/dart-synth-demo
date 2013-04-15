@@ -33,6 +33,7 @@ void main() {
   // create sounds
 
   context = new AudioContext();
+  print("context: ${context}");
 
   AudioBuffer sineWave = digitize(1, (num phase) {
     return math.sin(phase * TAU);
